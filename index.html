@@ -200,14 +200,6 @@
     transform: rotate(2.5deg);
   }
 
-  .hero-datestamp {
-    font-family: 'VT323', monospace;
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
-    color: var(--slate);
-    margin-bottom: 2rem;
-  }
-
   /* Strikethrough — high contrast version */
   .hero-struck {
     font-family: 'Space Mono', monospace;
@@ -811,9 +803,19 @@
     text-transform: uppercase;
     letter-spacing: 0.15em;
     padding: 0.2rem 0.6rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     background: var(--purple-vivid);
     color: white;
+  }
+
+  .blue-card:first-child .feast-date {
+    color: #6d28d9;
+    margin-bottom: 0.75rem;
+  }
+
+  .blue-card:last-child .feast-date {
+    color: #93c5fd;
+    margin-bottom: 0.75rem;
   }
 
   .blue-card:first-child .feast-name {
@@ -1155,7 +1157,6 @@
 <section class="hero" id="hero" aria-labelledby="hero-title">
   <div class="hero-bg-text" aria-hidden="true">TIME TIME TIME</div>
   <div class="hero-stamp" aria-hidden="true">Est. First Full Moon You Notice</div>
-  <div class="hero-datestamp" aria-hidden="true">/// LAST UPDATED: WHEN THE MOON SAID SO ///</div>
   <div class="hero-struck" aria-label="Rejecting: Fiscal Quarters, Black Friday, Performance Reviews, Prime Day, Q4 Targets, Cyber Monday, Year-End Close, Sprint Planning">
     <span>Fiscal Quarters</span><span class="dot" aria-hidden="true">·</span><span>Black Friday</span><span class="dot" aria-hidden="true">·</span><span>Performance Reviews</span><span class="dot" aria-hidden="true">·</span><span>Prime Day</span><span class="dot" aria-hidden="true">·</span><span>Q4 Targets</span><span class="dot" aria-hidden="true">·</span><span>Cyber Monday</span><span class="dot" aria-hidden="true">·</span><span>Year-End Close</span><span class="dot" aria-hidden="true">·</span><span>Sprint Planning</span>
   </div>
@@ -1325,12 +1326,14 @@
     <div class="blue-tier reveal">
       <article class="blue-card" tabindex="0">
         <div class="blue-badge">14 days</div>
+        <div class="feast-date" id="date-blue-moon-found"></div>
         <div class="feast-name">The Festival of Found Family</div>
         <div class="feast-desc">A full fortnight to celebrate the family you chose. Not a single dinner — a season of recognition.</div>
         <div class="blue-rare">~every 2.7 years. worth the wait.</div>
       </article>
       <article class="blue-card" tabindex="0">
         <div class="blue-badge">14 days</div>
+        <div class="feast-date" id="date-blue-moon-estrange"></div>
         <div class="feast-name">The Festival of Estrangement</div>
         <div class="feast-desc">Equal time for the losses. The families that couldn't or wouldn't hold us. The grief and the gift get the same weight.</div>
         <div class="blue-rare">the shadow companion. same duration, same dignity.</div>
@@ -1385,7 +1388,7 @@
   <div class="footer-right" aria-hidden="true">☾ keep different time ☾</div>
 </footer>
 
-<div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Current moon phase and next event countdown">
+<div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Next calendar event countdown">
   <span class="moon-widget-icon" id="moonIcon" aria-hidden="true">◑</span>
   <div class="moon-widget-text">
     <span id="moonLabel">Loading...</span>
@@ -1562,20 +1565,20 @@
   }
 
   const now = new Date();
-  const phase = getMoonPhase(now);
   const next = getNextEvent(now);
 
-  document.getElementById('moonIcon').textContent = phase.icon;
-  document.getElementById('moonLabel').textContent = phase.name;
-  document.getElementById('moonPhase').textContent = phase.prompt;
+  // Widget shows NEXT upcoming event only
+  document.getElementById('moonIcon').textContent = next.icon;
+  document.getElementById('moonLabel').textContent = next.name;
+  document.getElementById('moonPhase').textContent = next.sabbath;
 
   const countdownEl = document.getElementById('moonCountdown');
-  if (next.daysUntil <= 1) {
-    countdownEl.textContent = next.type === 'solar'
-      ? '→ ' + next.sabbath + ' is tomorrow!'
-      : '→ ' + next.sabbath + ' is tomorrow!';
+  if (next.daysUntil <= 0) {
+    countdownEl.textContent = '→ Today!';
+  } else if (next.daysUntil === 1) {
+    countdownEl.textContent = '→ Tomorrow!';
   } else {
-    countdownEl.textContent = '→ ' + next.sabbath + ' in ' + next.daysUntil + ' days';
+    countdownEl.textContent = '→ in ' + next.daysUntil + ' days';
   }
 
   // ========== POPULATE DATES ==========
@@ -1617,6 +1620,42 @@
       el.textContent = 'Next: ' + fmtDate(d);
     }
   });
+
+  // ========== BLUE MOON DATES ==========
+  // A blue moon is the second full moon in a calendar month.
+  // Find the next one by walking forward through full moons.
+  function findNextBlueMoon(fromDate) {
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    // Start from the next full moon
+    let age = getMoonAge(fromDate);
+    let daysToFull = (SYNODIC * 0.5) - age;
+    if (daysToFull <= 0) daysToFull += SYNODIC;
+    let fullMoonDate = new Date(fromDate.getTime() + daysToFull * DAY_MS);
+
+    // Walk through full moons for the next 5 years
+    for (let i = 0; i < 70; i++) {
+      const nextFull = new Date(fullMoonDate.getTime() + SYNODIC * DAY_MS);
+      // Same calendar month = blue moon
+      if (nextFull.getMonth() === fullMoonDate.getMonth() && nextFull.getFullYear() === fullMoonDate.getFullYear()) {
+        return nextFull;
+      }
+      fullMoonDate = nextFull;
+    }
+    return null;
+  }
+
+  const nextBlueMoon = findNextBlueMoon(now);
+  if (nextBlueMoon) {
+    const blueFmt = fmtDate(nextBlueMoon);
+    const blueEnd = new Date(nextBlueMoon.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const blueEndFmt = fmtDate(blueEnd);
+    const daysUntilBlue = Math.ceil((nextBlueMoon - now) / (1000 * 60 * 60 * 24));
+
+    const foundEl = document.getElementById('date-blue-moon-found');
+    const estrangeEl = document.getElementById('date-blue-moon-estrange');
+    if (foundEl) foundEl.textContent = 'Next: ' + blueFmt + ' (' + daysUntilBlue + ' days)';
+    if (estrangeEl) estrangeEl.textContent = blueFmt + ' – ' + blueEndFmt;
+  }
 </script>
 
 </body>
