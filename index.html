@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEEP DIFFERENT TIME — A Lunar Calendar for Chosen Family</title>
+<meta name="description" content="A shared lunar calendar that organizes life around the moon instead of the market. Solar feasts, lunar sabbaths, and blue moon festivals for found family.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=VT323&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* darks */
+    --void: #060a12;
+    --deep: #0c1220;
+    --night: #121d30;
+    --ocean: #152238;
+    --slate: #475569;
+
+    /* lights */
+    --silver: #cbd5e1;
+    --ice: #e2e8f0;
+    --frost: #f1f5f9;
+    --cold-white: #f8fafc;
+
+    /* blues */
+    --blue-deep: #1e3a5f;
+    --blue-mid: #2563eb;
+    --blue-bright: #60a5fa;
+    --blue-pale: #93c5fd;
+    --blue-wash: rgba(37, 99, 235, 0.08);
+
+    /* purples */
+    --purple-deep: #2e1065;
+    --purple-vivid: #7c3aed;
+    --purple-bright: #a78bfa;
+    --purple-light: #c4b5fd;
+    --purple-glow: #ddd6fe;
+    --purple-wash: rgba(124, 58, 237, 0.06);
+
+    --focus-ring: #a78bfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::selection { background: var(--purple-vivid); color: white; }
+
+  /* ========== A11Y FOUNDATIONS ========== */
+  *:focus { outline: none; }
+  *:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    background: var(--purple-vivid);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+    z-index: 9999;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus { top: 0; outline: 3px solid white; outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .feast-card, .moon-card { transform: none !important; }
+    .hero-sub { transform: none !important; }
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  body {
+    background: var(--cold-white);
+    color: var(--deep);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ========== SIDE NAV ========== */
+  .side-nav {
+    position: fixed;
+    left: 0; top: 0;
+    height: 100vh;
+    width: 48px;
+    background: var(--void);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-right: 1px solid var(--night);
+  }
+
+  .side-nav a {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    color: var(--silver);
+    text-decoration: none;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    padding: 0.8rem 0.3rem;
+    transition: all 0.15s ease;
+    font-family: 'IBM Plex Mono', monospace;
+    opacity: 0.4;
+    border-left: 2px solid transparent;
+  }
+
+  .side-nav a:hover,
+  .side-nav a.active {
+    opacity: 1;
+    background: var(--night);
+    border-left-color: var(--purple-bright);
+    color: var(--frost);
+  }
+
+  .side-nav a:focus-visible {
+    outline: 2px solid var(--purple-bright);
+    outline-offset: -2px;
+  }
+
+  .side-nav .nav-moon {
+    font-size: 1.2rem;
+    writing-mode: horizontal-tb;
+    padding: 0.6rem 0;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+    color: var(--purple-light);
+  }
+
+  .side-nav .nav-moon:hover { background: transparent; }
+
+  main { margin-left: 48px; }
+
+  /* ========== HERO ========== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 3rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--ice);
+    background:
+      radial-gradient(ellipse at 85% 15%, rgba(124,58,237,0.05) 0%, transparent 45%),
+      radial-gradient(ellipse at 15% 85%, rgba(37,99,235,0.04) 0%, transparent 40%),
+      var(--cold-white);
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    font-family: 'Oswald', sans-serif;
+    font-size: 20vw;
+    font-weight: 700;
+    color: var(--purple-vivid);
+    opacity: 0.02;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+
+  .hero-stamp {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    border: 3px solid var(--purple-vivid);
+    padding: 0.5rem 1.1rem;
+    font-family: 'VT323', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--purple-vivid);
+    transform: rotate(2.5deg);
+  }
+
+  .hero-datestamp {
+    font-family: 'VT323', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--slate);
+    margin-bottom: 2rem;
+  }
+
+  /* Strikethrough — high contrast version */
+  .hero-struck {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.7rem, 1.3vw, 0.95rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8; /* slate-400: 4.56:1 on white */
+    text-decoration: line-through;
+    text-decoration-color: #94a3b8;
+    text-decoration-thickness: 2px;
+    margin-bottom: 1.5rem;
+    line-height: 2;
+    max-width: 750px;
+  }
+
+  .hero-struck span { display: inline; }
+  .hero-struck .dot { margin: 0 0.6rem; text-decoration: none; display: inline-block; }
+
+  .hero h1 {
+    font-size: clamp(3rem, 10vw, 8.5rem);
+    line-height: 0.88;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    max-width: 950px;
+  }
+
+  .w-keep { font-family: 'Oswald', sans-serif; font-weight: 700; display: block; color: var(--deep); }
+  .w-different { font-family: 'Playfair Display', serif; font-weight: 900; font-style: italic; display: block; padding-left: 5%; color: var(--purple-vivid); }
+  .w-time { font-family: 'Syne', sans-serif; font-weight: 800; display: block; padding-left: 12%; color: var(--deep); }
+
+  .hero-sub {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    max-width: 520px;
+    margin-top: 2.5rem;
+    line-height: 1.7;
+    padding: 1.25rem 1.5rem;
+    background: var(--frost);
+    border: 1px solid rgba(124,58,237,0.08);
+    border-left: 3px solid var(--purple-vivid);
+    transform: rotate(-0.5deg);
+    color: var(--night);
+    position: relative;
+  }
+
+  .hero-sub::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: 30px;
+    width: 80px; height: 16px;
+    background: rgba(168,85,247,0.12);
+    transform: rotate(-2deg);
+  }
+
+  .scroll-arrow {
+    position: absolute;
+    bottom: 2rem; right: 3rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    animation: bounce 1.5s ease-in-out infinite;
+    color: var(--purple-bright);
+    opacity: 0.5;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* ========== ARGUMENT ========== */
+  .argument {
+    padding: 0;
+    /* BLUE-TO-BLACK gradient background */
+    background:
+      linear-gradient(180deg,
+        var(--void) 0%,
+        var(--night) 25%,
+        var(--ocean) 50%,
+        var(--night) 75%,
+        var(--void) 100%
+      );
+    color: var(--frost);
+    border-bottom: 2px solid var(--purple-vivid);
+  }
+
+  .arg-panel {
+    padding: 4rem 3rem 4rem 4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.3s ease;
+  }
+
+  .arg-panel:hover { background: rgba(255,255,255,0.03); }
+  .arg-panel:last-child { border-bottom: none; }
+
+  .arg-panel:focus-visible {
+    outline: 3px solid var(--purple-bright);
+    outline-offset: -3px;
+  }
+
+  .arg-num {
+    font-family: 'VT323', monospace;
+    font-size: 5rem;
+    line-height: 1;
+    position: absolute;
+    right: 3rem; top: 2rem;
+    opacity: 0.12;
+    /* purple-blue gradient text */
+    background: linear-gradient(135deg, var(--purple-bright), var(--blue-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .arg-headline {
+    font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+    line-height: 1.15;
+    max-width: 700px;
+    transition: margin-bottom 0.4s ease;
+  }
+
+  .arg-headline .font-a { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; }
+  .arg-headline .font-b { font-family: 'Playfair Display', serif; font-style: italic; }
+  .arg-headline .font-c { font-family: 'Syne', sans-serif; font-weight: 800; }
+  .arg-headline .font-d { font-family: 'DM Serif Display', serif; }
+  .arg-headline .font-e { font-family: 'Courier Prime', monospace; }
+
+  /* ACCESSIBLE accent colors — all pass 4.5:1 on dark backgrounds */
+  .arg-headline .purple { color: #c4b5fd; } /* purple-300: ~8.5:1 on void */
+  .arg-headline .blue-accent { color: #93c5fd; } /* blue-300: ~8.1:1 on void */
+  .arg-headline .struck { text-decoration: line-through; text-decoration-thickness: 2px; opacity: 0.5; }
+
+  .arg-body {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9rem;
+    line-height: 1.85;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    max-width: 600px;
+    color: #e2e8f0; /* ice: ~13:1 on void */
+  }
+
+  .arg-panel[aria-expanded="true"] .arg-body {
+    opacity: 1;
+    max-height: 300px;
+    margin-top: 1.5rem;
+  }
+
+  .arg-toggle {
+    position: absolute;
+    right: 3rem; bottom: 2rem;
+    font-family: 'VT323', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.25;
+    transition: opacity 0.2s;
+    color: var(--purple-light);
+  }
+
+  .arg-panel:hover .arg-toggle { opacity: 0.6; }
+
+  .arg-body em {
+    font-style: normal;
+    color: #c4b5fd; /* purple-300 */
+    background: rgba(124,58,237,0.12);
+    padding: 0 0.2em;
+  }
+
+  /* ========== PULLQUOTE ========== */
+  .pullquote {
+    /* blue-to-purple gradient */
+    background:
+      linear-gradient(135deg, var(--blue-deep) 0%, var(--purple-deep) 60%, var(--night) 100%);
+    color: var(--frost);
+    padding: 5rem 3rem 5rem 4rem;
+    position: relative;
+    border-bottom: 2px solid var(--blue-mid);
+    overflow: hidden;
+  }
+
+  .pullquote p {
+    font-size: clamp(1.6rem, 5vw, 3.5rem);
+    max-width: 850px;
+    line-height: 1.25;
+  }
+
+  /* All pullquote text: high contrast on dark bg */
+  .pullquote .pq-a { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; color: #cbd5e1; } /* silver: ~11:1 */
+  .pullquote .pq-b { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; color: #f1f5f9; } /* frost: ~16:1 */
+  .pullquote .pq-c {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    color: #c4b5fd; /* purple-300: passes on dark blue */
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 5px;
+    text-decoration-color: var(--purple-vivid);
+  }
+
+  .pullquote::after {
+    content: '☾';
+    position: absolute;
+    right: 4rem; bottom: -1.5rem;
+    font-size: 14rem;
+    opacity: 0.06;
+    color: var(--blue-bright);
+  }
+
+  .pullquote::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -5%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* ========== CALENDAR ========== */
+  .calendar-section {
+    padding: 5rem 3rem 5rem 4rem;
+    border-bottom: 1px solid var(--ice);
+    background:
+      radial-gradient(ellipse at 30% 0%, rgba(37,99,235,0.03) 0%, transparent 40%),
+      radial-gradient(ellipse at 70% 100%, rgba(124,58,237,0.03) 0%, transparent 40%),
+      var(--cold-white);
+  }
+
+  .cal-section-title {
+    font-family: 'VT323', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5em;
+    color: var(--slate);
+    margin-bottom: 4rem;
+  }
+
+  .tier { margin-bottom: 5rem; }
+
+  .tier-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tier-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    text-transform: uppercase;
+    color: var(--deep);
+  }
+
+  .tier-note {
+    font-family: 'Courier Prime', monospace;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--slate); /* 4.6:1 on white */
+  }
+
+  .tier-line {
+    border: none;
+    border-top: 2px dashed var(--purple-vivid);
+    opacity: 0.2;
+    margin-bottom: 2rem;
+  }
+
+  /* FEAST CARDS */
+  .feast-collage {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  @media (max-width: 900px) { .feast-collage { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .feast-collage { grid-template-columns: 1fr; } }
+
+  .feast-card {
+    border: 2px solid var(--deep);
+    padding: 1.5rem 1.25rem;
+    position: relative;
+    background: var(--cold-white);
+    transition: all 0.2s ease;
+  }
+
+  .feast-card:nth-child(1) { transform: rotate(-1deg); }
+  .feast-card:nth-child(2) { transform: rotate(0.5deg); margin-top: 1rem; }
+  .feast-card:nth-child(3) { transform: rotate(-0.3deg); }
+  .feast-card:nth-child(4) { transform: rotate(0.8deg); margin-top: 0.5rem; }
+
+  .feast-card:hover {
+    transform: translate(-2px, -2px) rotate(0deg) !important;
+    box-shadow: 4px 4px 0 var(--purple-vivid);
+    border-color: var(--purple-vivid);
+    z-index: 2;
+  }
+
+  .feast-card:focus-within {
+    box-shadow: 4px 4px 0 var(--purple-vivid);
+    border-color: var(--purple-vivid);
+  }
+
+  .feast-card:nth-child(1)::before,
+  .feast-card:nth-child(3)::before {
+    content: '';
+    position: absolute;
+    top: -6px; right: 15px;
+    width: 60px; height: 14px;
+    background: rgba(168,85,247,0.12);
+    transform: rotate(3deg);
+  }
+
+  .feast-card:nth-child(2)::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 20px;
+    width: 70px; height: 14px;
+    background: rgba(37,99,235,0.1);
+    transform: rotate(-1deg);
+  }
+
+  .feast-season {
+    font-family: 'VT323', monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #6d28d9; /* purple-700: 5.4:1 on white */
+    margin-bottom: 0.5rem;
+  }
+
+  .feast-name {
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+    color: var(--deep); /* ~18:1 on white */
+  }
+
+  .feast-card:nth-child(1) .feast-name { font-family: 'Playfair Display', serif; font-weight: 900; font-style: italic; }
+  .feast-card:nth-child(2) .feast-name { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; }
+  .feast-card:nth-child(3) .feast-name { font-family: 'DM Serif Display', serif; }
+  .feast-card:nth-child(4) .feast-name { font-family: 'Syne', sans-serif; font-weight: 800; text-transform: uppercase; }
+
+  .feast-desc {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    font-style: italic;
+    color: var(--slate); /* 4.6:1 on white */
+  }
+
+  /* LUNAR SCROLL */
+  .lunar-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    margin: 0 -3rem 0 -1rem;
+    padding: 1rem 3rem 2rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--purple-vivid) transparent;
+    cursor: grab;
+  }
+
+  .lunar-scroll-wrapper:active { cursor: grabbing; }
+  .lunar-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+  .lunar-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+  .lunar-scroll-wrapper::-webkit-scrollbar-thumb { background: var(--purple-vivid); border-radius: 3px; }
+
+  .lunar-scroll-hint {
+    font-family: 'VT323', monospace;
+    font-size: 0.75rem;
+    color: var(--slate);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  .lunar-scroll-track {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    padding-bottom: 0.5rem;
+  }
+
+  .moon-card {
+    width: 280px;
+    min-width: 280px;
+    padding: 2rem 1.5rem;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    /* blue-to-black gradient per card */
+    background: linear-gradient(160deg, var(--ocean) 0%, var(--deep) 60%, var(--void) 100%);
+    color: var(--frost);
+    border: 1px solid rgba(96,165,250,0.15);
+  }
+
+  .moon-card:nth-child(1) { transform: rotate(0.3deg); }
+  .moon-card:nth-child(2) { transform: rotate(-0.5deg); margin-top: 1.5rem; }
+  .moon-card:nth-child(3) { transform: rotate(0.2deg); }
+  .moon-card:nth-child(4) { transform: rotate(-0.4deg); margin-top: 1rem; }
+
+  .moon-card:hover {
+    transform: scale(1.03) rotate(0deg) !important;
+    box-shadow: 0 0 20px rgba(37,99,235,0.15), 0 0 0 2px var(--purple-bright);
+    z-index: 2;
+  }
+
+  .moon-card:focus-within {
+    box-shadow: 0 0 20px rgba(37,99,235,0.15), 0 0 0 2px var(--purple-bright);
+  }
+
+  .moon-symbol {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    line-height: 1;
+    color: var(--purple-light); /* decorative, also visible */
+  }
+
+  .moon-phase-label {
+    font-family: 'VT323', monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #93c5fd; /* blue-300: ~8:1 on void */
+    margin-bottom: 0.5rem;
+  }
+
+  .moon-card:nth-child(1) .feast-name { font-family: 'Courier Prime', monospace; font-weight: 700; }
+  .moon-card:nth-child(2) .feast-name { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; }
+  .moon-card:nth-child(3) .feast-name { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; }
+  .moon-card:nth-child(4) .feast-name { font-family: 'DM Serif Display', serif; }
+
+  .moon-card .feast-name {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: #f1f5f9; /* frost: ~16:1 on void */
+  }
+
+  .moon-card .feast-desc {
+    color: #cbd5e1; /* silver: ~11:1 on void */
+  }
+
+  .moon-prompt {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(96,165,250,0.12);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: #94a3b8; /* slate-400: ~7:1 on void */
+  }
+
+  .moon-prompt span { color: var(--purple-light); }
+
+  /* BLUE MOON */
+  .blue-tier {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-width: 700px;
+    overflow: hidden;
+    border: 2px solid var(--purple-vivid);
+  }
+
+  @media (max-width: 600px) { .blue-tier { grid-template-columns: 1fr; } }
+
+  .blue-card { padding: 2rem 1.5rem; }
+
+  .blue-card:first-child {
+    background: var(--cold-white);
+    color: var(--deep);
+    border-right: 2px solid var(--purple-vivid);
+  }
+
+  @media (max-width: 600px) {
+    .blue-card:first-child { border-right: none; border-bottom: 2px solid var(--purple-vivid); }
+  }
+
+  .blue-card:last-child {
+    /* blue-to-purple-to-black */
+    background: linear-gradient(160deg, var(--blue-deep) 0%, var(--purple-deep) 50%, var(--void) 100%);
+    color: var(--frost);
+  }
+
+  .blue-badge {
+    display: inline-block;
+    font-family: 'VT323', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 1rem;
+    background: var(--purple-vivid);
+    color: white;
+  }
+
+  .blue-card:first-child .feast-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: #5b21b6; /* purple-800: 7.8:1 on white */
+  }
+
+  .blue-card:last-child .feast-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: #ddd6fe; /* purple-200: ~11:1 on void */
+  }
+
+  .blue-card:first-child .feast-desc { color: var(--slate); } /* 4.6:1 on white */
+  .blue-card:last-child .feast-desc { color: #cbd5e1; } /* 11:1 on void */
+
+  .blue-rare {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  .blue-card:first-child .blue-rare { color: var(--slate); }
+  .blue-card:last-child .blue-rare { color: #94a3b8; }
+
+  /* ========== HOW ========== */
+  .how-section {
+    background: var(--frost);
+    padding: 5rem 3rem 5rem 4rem;
+    border-bottom: 1px solid var(--ice);
+    position: relative;
+  }
+
+  .how-section::before {
+    content: '';
+    position: absolute;
+    top: -6px; left: 25%;
+    width: 120px; height: 16px;
+    background: rgba(168,85,247,0.12);
+    transform: rotate(-1deg);
+  }
+
+  .how-steps {
+    max-width: 700px;
+    counter-reset: howstep;
+    list-style: none;
+  }
+
+  .how-step {
+    counter-increment: howstep;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(124,58,237,0.08);
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .how-step:last-child { border-bottom: none; }
+
+  .how-step::before {
+    content: counter(howstep);
+    font-family: 'VT323', monospace;
+    font-size: 3rem;
+    color: var(--purple-vivid); /* 4.6:1 on frost */
+    line-height: 1;
+    min-width: 2.5rem;
+  }
+
+  .how-step h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    color: var(--deep);
+  }
+
+  .how-step p {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: #475569; /* slate: 4.6:1 on frost */
+  }
+
+  /* ========== CTA ========== */
+  .cta-section {
+    /* the big blue-purple-black gradient moment */
+    background:
+      linear-gradient(135deg,
+        var(--void) 0%,
+        var(--blue-deep) 25%,
+        var(--purple-deep) 55%,
+        var(--void) 100%
+      );
+    color: var(--frost);
+    padding: 5rem 3rem 5rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: -20%; left: 30%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .cta-section::after {
+    content: '';
+    position: absolute;
+    bottom: -10%; right: 10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-a { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; display: block; color: #cbd5e1; }
+  .cta-b { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; color: #c4b5fd; display: block; padding-left: 3%; }
+  .cta-c { font-family: 'Syne', sans-serif; font-weight: 800; display: block; padding-left: 7%; color: #f1f5f9; }
+
+  .cta-sub {
+    font-family: 'Courier Prime', monospace;
+    font-style: italic;
+    font-size: 0.85rem;
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    color: #94a3b8; /* ~7:1 on void */
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    background: none;
+    border: 2px solid var(--frost);
+    color: var(--frost);
+  }
+
+  .cta-btn:hover {
+    background: var(--frost);
+    color: var(--void);
+  }
+
+  .cta-btn:focus-visible {
+    outline: 3px solid var(--purple-bright);
+    outline-offset: 3px;
+  }
+
+  .cta-btn.btn-purple {
+    border-color: var(--purple-bright);
+    color: var(--purple-light);
+    background: rgba(124,58,237,0.15);
+  }
+
+  .cta-btn.btn-purple:hover {
+    background: var(--purple-vivid);
+    color: white;
+    border-color: var(--purple-vivid);
+    box-shadow: 0 0 25px rgba(124,58,237,0.3);
+  }
+
+  .cta-moon-bg {
+    position: absolute;
+    right: -2rem; bottom: -3rem;
+    font-size: 18rem;
+    opacity: 0.03;
+    line-height: 1;
+    pointer-events: none;
+    color: var(--blue-bright);
+  }
+
+  /* ========== FOOTER ========== */
+  footer {
+    margin-left: 48px;
+    background: var(--void);
+    color: var(--silver);
+    padding: 1.5rem 3rem 1.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--night);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-left {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #64748b; /* ~5:1 on void */
+  }
+
+  .footer-right {
+    font-family: 'VT323', monospace;
+    font-size: 0.85rem;
+    color: #7c3aed; /* visible on void */
+  }
+
+  /* ========== MOON WIDGET ========== */
+  .moon-widget {
+    position: fixed;
+    bottom: 1.5rem; right: 1.5rem;
+    z-index: 100;
+    /* blue-to-purple gradient */
+    background: linear-gradient(135deg, var(--night) 0%, var(--purple-deep) 100%);
+    border: 1px solid rgba(124,58,237,0.3);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.25), 0 0 15px rgba(37,99,235,0.08);
+  }
+
+  .moon-widget:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.25), 0 0 25px rgba(124,58,237,0.15);
+    border-color: var(--purple-bright);
+  }
+
+  .moon-widget:focus-visible {
+    outline: 3px solid var(--purple-bright);
+    outline-offset: 3px;
+  }
+
+  .moon-widget-icon { font-size: 1.3rem; }
+
+  .moon-widget-text {
+    color: #e2e8f0; /* high contrast */
+    font-family: 'VT323', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+  }
+
+  .moon-widget-phase {
+    color: #c4b5fd; /* purple-300 */
+    display: block;
+  }
+
+  /* ========== ANIMATIONS ========== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-stagger-1 { transition-delay: 0.05s; }
+  .reveal-stagger-2 { transition-delay: 0.1s; }
+  .reveal-stagger-3 { transition-delay: 0.15s; }
+  .reveal-stagger-4 { transition-delay: 0.2s; }
+
+  /* ========== MOBILE ========== */
+  @media (max-width: 768px) {
+    .side-nav { display: none; }
+    main { margin-left: 0; }
+    footer { margin-left: 0; }
+    .hero, .argument .arg-panel, .calendar-section, .how-section, .cta-section {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .arg-num { position: static; font-size: 3rem; margin-bottom: 0.5rem; }
+    .arg-toggle { display: none; }
+    .arg-body { opacity: 1 !important; max-height: none !important; margin-top: 1rem !important; }
+    .moon-widget { bottom: 0.75rem; right: 0.75rem; }
+    .hero-stamp { top: 1rem; right: 1.5rem; font-size: 0.65rem; padding: 0.35rem 0.75rem; }
+  }
+
+  @media (forced-colors: active) {
+    .feast-card, .moon-card, .blue-card, .cta-btn { border: 2px solid CanvasText; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="side-nav" aria-label="Section navigation">
+  <span class="nav-moon" aria-hidden="true">☾</span>
+  <a href="#hero" class="active" aria-label="Back to top">Top</a>
+  <a href="#argument" aria-label="Why keep different time">Why</a>
+  <a href="#calendar" aria-label="The calendar">Cal</a>
+  <a href="#how" aria-label="How to start">How</a>
+  <a href="#download" aria-label="Download the calendar">Get</a>
+</nav>
+
+<main id="main-content">
+
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="hero-bg-text" aria-hidden="true">TIME TIME TIME</div>
+  <div class="hero-stamp" aria-hidden="true">Est. First Full Moon You Notice</div>
+  <div class="hero-datestamp" aria-hidden="true">/// LAST UPDATED: WHEN THE MOON SAID SO ///</div>
+  <div class="hero-struck" aria-label="Rejecting: Fiscal Quarters, Black Friday, Performance Reviews, Prime Day, Q4 Targets, Cyber Monday, Year-End Close, Sprint Planning">
+    <span>Fiscal Quarters</span><span class="dot" aria-hidden="true">·</span><span>Black Friday</span><span class="dot" aria-hidden="true">·</span><span>Performance Reviews</span><span class="dot" aria-hidden="true">·</span><span>Prime Day</span><span class="dot" aria-hidden="true">·</span><span>Q4 Targets</span><span class="dot" aria-hidden="true">·</span><span>Cyber Monday</span><span class="dot" aria-hidden="true">·</span><span>Year-End Close</span><span class="dot" aria-hidden="true">·</span><span>Sprint Planning</span>
+  </div>
+  <h1 id="hero-title">
+    <span class="w-keep">Keep</span>
+    <span class="w-different">Different</span>
+    <span class="w-time">Time</span>
+  </h1>
+  <p class="hero-sub">
+    The most radical thing you can do is change what clock you live by. This one runs on the moon. No one can own it, sell it, or take it away from you.
+  </p>
+  <div class="scroll-arrow" aria-hidden="true">↓ scroll ↓</div>
+</section>
+
+<section class="argument" id="argument" aria-labelledby="arg-heading">
+  <h2 id="arg-heading" class="sr-only">Why keep different time</h2>
+
+  <div class="arg-panel" role="button" tabindex="0" aria-expanded="false" onclick="toggleArg(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleArg(this)}">
+    <div class="arg-num" aria-hidden="true">01</div>
+    <div class="arg-headline">
+      <span class="font-a">The clock you live by</span> <span class="font-b purple">determines who you serve.</span>
+    </div>
+    <div class="arg-body" role="region">
+      The dominant calendar is an extraction schedule disguised as neutral time. Every recurring rhythm in mainstream life either exists to organize your labor or organize your consumption. When people say time is <em>"moving too fast"</em> — that's not a personal failing. That's the calendar working as designed.
+    </div>
+    <div class="arg-toggle" aria-hidden="true"><span class="arg-toggle-text">[read]</span></div>
+  </div>
+
+  <div class="arg-panel" role="button" tabindex="0" aria-expanded="false" onclick="toggleArg(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleArg(this)}">
+    <div class="arg-num" aria-hidden="true">02</div>
+    <div class="arg-headline">
+      <span class="font-d">Celestial time is the</span> <span class="font-c purple">one clock nobody owns.</span>
+    </div>
+    <div class="arg-body" role="region">
+      The moon doesn't have a shareholder. The solstice doesn't have a marketing team. These rhythms predate every empire, every economy, every institution. <em>No one can buy the full moon.</em> No one can move the equinox to maximize Q4 revenue. Choosing celestial time is a quiet, structural act of refusal.
+    </div>
+    <div class="arg-toggle" aria-hidden="true"><span class="arg-toggle-text">[read]</span></div>
+  </div>
+
+  <div class="arg-panel" role="button" tabindex="0" aria-expanded="false" onclick="toggleArg(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleArg(this)}">
+    <div class="arg-num" aria-hidden="true">03</div>
+    <div class="arg-headline">
+      <span class="font-b">The system's deepest capture</span> <span class="font-a blue-accent">is temporal.</span>
+    </div>
+    <div class="arg-body" role="region">
+      It doesn't just take your money or your labor — it takes your <em>when</em>. It decides when you rest, when you celebrate, when you grieve. You get the weekend if you're lucky. You get three bereavement days. Taking back the authority to decide when we feast, when we mourn, when we serve, when we seek joy — that's reclaiming the most fundamental organizing principle of human life.
+    </div>
+    <div class="arg-toggle" aria-hidden="true"><span class="arg-toggle-text">[read]</span></div>
+  </div>
+
+  <div class="arg-panel" role="button" tabindex="0" aria-expanded="false" onclick="toggleArg(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleArg(this)}">
+    <div class="arg-num" aria-hidden="true">04</div>
+    <div class="arg-headline">
+      <span class="font-c">Chosen family</span> <span class="font-e struck">doesn't have holidays</span> <span class="font-d purple">— until now.</span>
+    </div>
+    <div class="arg-body" role="region">
+      The relationships you chose are more fragile than the ones you inherited — not because they matter less, but because <em>nothing structural holds them together.</em> Biological families have Thanksgiving, Christmas, birthdays. Found family has... brunch? Maybe? A shared calendar gives the family you built the same scaffolding that inherited bonds get by default.
+    </div>
+    <div class="arg-toggle" aria-hidden="true"><span class="arg-toggle-text">[read]</span></div>
+  </div>
+
+</section>
+
+<section class="pullquote" aria-label="Key message">
+  <p>
+    <span class="pq-a">You don't have to leave the system.</span><br>
+    <span class="pq-b">You just start keeping</span><br>
+    <span class="pq-c">different time.</span>
+  </p>
+</section>
+
+<section class="calendar-section" id="calendar" aria-labelledby="cal-heading">
+  <h2 id="cal-heading" class="sr-only">The Calendar</h2>
+  <div class="cal-section-title" aria-hidden="true">/// The Calendar ///</div>
+
+  <div class="tier" role="region" aria-label="Solar Feasts">
+    <div class="tier-head">
+      <h3 class="tier-name">Solar Feasts</h3>
+      <span class="tier-note">— four times a year, when the earth turns</span>
+    </div>
+    <hr class="tier-line" aria-hidden="true">
+    <div class="feast-collage" role="list">
+      <article class="feast-card reveal reveal-stagger-1" role="listitem" tabindex="0">
+        <div class="feast-season">Spring Equinox</div>
+        <div class="feast-name">The Feast of Transition</div>
+        <div class="feast-desc">To celebrate coming out — in all its forms. Light crosses into dominance. The earth itself is emerging from dormancy.</div>
+      </article>
+      <article class="feast-card reveal reveal-stagger-2" role="listitem" tabindex="0">
+        <div class="feast-season">Summer Solstice</div>
+        <div class="feast-name">The Feast of Joy</div>
+        <div class="feast-desc">To celebrate living outside the closet and outside the lines. Maximum light, minimum shadow. Be fully, completely seen.</div>
+      </article>
+      <article class="feast-card reveal reveal-stagger-3" role="listitem" tabindex="0">
+        <div class="feast-season">Fall Equinox</div>
+        <div class="feast-name">The Feast of the Elders</div>
+        <div class="feast-desc">To honor our heritage, our ancestors, and the ones who planted what we're harvesting now. We reap what others sowed.</div>
+      </article>
+      <article class="feast-card reveal reveal-stagger-4" role="listitem" tabindex="0">
+        <div class="feast-season">Winter Solstice</div>
+        <div class="feast-name">The Feast of Woes</div>
+        <div class="feast-desc">To mock our oppressors and mourn the closet. The longest night holds both grief and subversive laughter.</div>
+      </article>
+    </div>
+  </div>
+
+  <div class="tier" role="region" aria-label="Lunar Sabbaths">
+    <div class="tier-head">
+      <h3 class="tier-name">Lunar Sabbaths</h3>
+      <span class="tier-note">— every month, the moon decides</span>
+    </div>
+    <hr class="tier-line" aria-hidden="true">
+    <div class="lunar-scroll-hint" aria-hidden="true">← drag to scroll →</div>
+    <div class="lunar-scroll-wrapper" id="lunarScroll" role="region" aria-label="Lunar sabbath cards, scrollable" tabindex="0">
+      <div class="lunar-scroll-track" role="list">
+        <article class="moon-card" role="listitem" tabindex="0">
+          <span class="moon-symbol" aria-hidden="true">●</span>
+          <div class="moon-phase-label">New Moon</div>
+          <div class="feast-name">Bear Each Other's Burdens</div>
+          <div class="feast-desc">Charity work. Service days. Mutual aid in darkness, without audience.</div>
+          <div class="moon-prompt"><span>prompt:</span> Who needs help? What can you offer?</div>
+        </article>
+        <article class="moon-card" role="listitem" tabindex="0">
+          <span class="moon-symbol" aria-hidden="true">◑</span>
+          <div class="moon-phase-label">Waxing Moon</div>
+          <div class="feast-name">Seek Queer Joy</div>
+          <div class="feast-desc">Light building, energy rising. Go find what makes you feel alive.</div>
+          <div class="moon-prompt"><span>prompt:</span> What brings you joy? Where will you go looking?</div>
+        </article>
+        <article class="moon-card" role="listitem" tabindex="0">
+          <span class="moon-symbol" aria-hidden="true">○</span>
+          <div class="moon-phase-label">Full Moon</div>
+          <div class="feast-name">Feast & Share Plenty</div>
+          <div class="feast-desc">Maximum illumination. Gather. Eat together. Share what you have.</div>
+          <div class="moon-prompt"><span>prompt:</span> Where are we meeting? What did you bring?</div>
+        </article>
+        <article class="moon-card" role="listitem" tabindex="0">
+          <span class="moon-symbol" aria-hidden="true">◐</span>
+          <div class="moon-phase-label">Waning Moon</div>
+          <div class="feast-name">Learn Our History</div>
+          <div class="feast-desc">Light turning inward. Study. Read. Listen to the ones who came before.</div>
+          <div class="moon-prompt"><span>prompt:</span> What are you learning? Who's teaching you?</div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="tier" role="region" aria-label="Blue Moon High Sabbaths">
+    <div class="tier-head">
+      <h3 class="tier-name">Blue Moon High Sabbaths</h3>
+      <span class="tier-note">— rare time outside of time</span>
+    </div>
+    <hr class="tier-line" aria-hidden="true">
+    <div class="blue-tier reveal">
+      <article class="blue-card" tabindex="0">
+        <div class="blue-badge">14 days</div>
+        <div class="feast-name">The Festival of Found Family</div>
+        <div class="feast-desc">A full fortnight to celebrate the family you chose. Not a single dinner — a season of recognition.</div>
+        <div class="blue-rare">~every 2.7 years. worth the wait.</div>
+      </article>
+      <article class="blue-card" tabindex="0">
+        <div class="blue-badge">14 days</div>
+        <div class="feast-name">The Festival of Estrangement</div>
+        <div class="feast-desc">Equal time for the losses. The families that couldn't or wouldn't hold us. The grief and the gift get the same weight.</div>
+        <div class="blue-rare">the shadow companion. same duration, same dignity.</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="how-section" id="how" aria-labelledby="how-heading">
+  <h2 id="how-heading" class="sr-only">How to start</h2>
+  <div class="cal-section-title" aria-hidden="true">/// How to Start ///</div>
+  <ol class="how-steps">
+    <li class="how-step reveal">
+      <div class="how-text">
+        <h3>Download the calendar</h3>
+        <p>A printable template mapping lunar phases and solar feasts for the year. Pin it up. That's the entire infrastructure.</p>
+      </div>
+    </li>
+    <li class="how-step reveal">
+      <div class="how-text">
+        <h3>Invite one person</h3>
+        <p>This isn't a movement. It's a rhythm. It works when it's shared with the people you're actually trying to hold close. Start with one.</p>
+      </div>
+    </li>
+    <li class="how-step reveal">
+      <div class="how-text">
+        <h3>Let the moon organize you</h3>
+        <p>You don't have to do all of it. Notice which phase the moon is in. Let the question it carries sit with you. The rhythm does the relational work that individual willpower can't sustain.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section class="cta-section" id="download" aria-labelledby="cta-heading">
+  <h2 id="cta-heading">
+    <span class="cta-a">Start keeping</span>
+    <span class="cta-b">different</span>
+    <span class="cta-c">time.</span>
+  </h2>
+  <p class="cta-sub">A printable calendar. A shared rhythm. An ancient clock that belongs to no one and therefore belongs to you.</p>
+  <div class="cta-buttons" role="group" aria-label="Download options">
+    <a href="#" class="cta-btn" role="button">Download Calendar (PDF)</a>
+    <a href="#" class="cta-btn btn-purple" role="button">Send to a Friend</a>
+  </div>
+  <div class="cta-moon-bg" aria-hidden="true">☾</div>
+</section>
+
+</main>
+
+<footer role="contentinfo">
+  <div class="footer-left">No copyright · No trademark · No ownership · Take it · Change it · Make it yours</div>
+  <div class="footer-right" aria-hidden="true">☾ keep different time ☾</div>
+</footer>
+
+<div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Current moon phase">
+  <span class="moon-widget-icon" id="moonIcon" aria-hidden="true">◑</span>
+  <div class="moon-widget-text">
+    <span id="moonLabel">Loading...</span>
+    <span class="moon-widget-phase" id="moonPhase"></span>
+  </div>
+</div>
+
+<script>
+  function toggleArg(el) {
+    const expanded = el.getAttribute('aria-expanded') === 'true';
+    el.setAttribute('aria-expanded', !expanded);
+    const t = el.querySelector('.arg-toggle-text');
+    if (t) t.textContent = expanded ? '[read]' : '[close]';
+  }
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReducedMotion) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.side-nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.getAttribute('id');
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      a.removeAttribute('aria-current');
+      if (a.getAttribute('href') === '#' + current) {
+        a.classList.add('active');
+        a.setAttribute('aria-current', 'true');
+      }
+    });
+  });
+
+  const ls = document.getElementById('lunarScroll');
+  let isDown = false, startX, scrollLeft;
+  ls.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - ls.offsetLeft; scrollLeft = ls.scrollLeft; });
+  ls.addEventListener('mouseleave', () => isDown = false);
+  ls.addEventListener('mouseup', () => isDown = false);
+  ls.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    ls.scrollLeft = scrollLeft - (e.pageX - ls.offsetLeft - startX) * 1.5;
+  });
+
+  ls.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { ls.scrollLeft += 150; e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { ls.scrollLeft -= 150; e.preventDefault(); }
+  });
+
+  function getMoonPhase() {
+    const d = new Date();
+    let y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+    if (m < 3) { y--; m += 12; }
+    m++;
+    let jd = 365.25 * y + 30.6 * m + day - 694039.09;
+    jd /= 29.5305882;
+    let b = Math.round((jd - Math.floor(jd)) * 8);
+    if (b >= 8) b = 0;
+    return [
+      { icon: '🌑', name: 'New Moon', prompt: 'Who needs help today?' },
+      { icon: '🌒', name: 'Waxing Crescent', prompt: 'What joy are you seeking?' },
+      { icon: '🌓', name: 'First Quarter', prompt: 'What joy are you seeking?' },
+      { icon: '🌔', name: 'Waxing Gibbous', prompt: 'What joy are you seeking?' },
+      { icon: '🌕', name: 'Full Moon', prompt: 'Who are you gathering with?' },
+      { icon: '🌖', name: 'Waning Gibbous', prompt: 'What are you learning?' },
+      { icon: '🌗', name: 'Last Quarter', prompt: 'What are you learning?' },
+      { icon: '🌘', name: 'Waning Crescent', prompt: 'What are you learning?' }
+    ][b];
+  }
+
+  const phase = getMoonPhase();
+  document.getElementById('moonIcon').textContent = phase.icon;
+  document.getElementById('moonLabel').textContent = phase.name;
+  document.getElementById('moonPhase').textContent = phase.prompt;
+</script>
+
+</body>
+</html>
