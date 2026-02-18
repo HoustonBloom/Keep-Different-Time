@@ -1666,7 +1666,7 @@
 
   async function loadGothicFont() {
     if (_gothicFontBase64) return _gothicFontBase64;
-    const res = await fetch('https://fonts.gstatic.com/s/unifrakturmaguntia/v22/WWXPlieVYwiGNomYU-ciRLRvEmK7oaVunw.ttf');
+    const res = await fetch('UnifrakturMaguntia.ttf');
     const buf = await res.arrayBuffer();
     // Convert ArrayBuffer to base64
     const bytes = new Uint8Array(buf);
