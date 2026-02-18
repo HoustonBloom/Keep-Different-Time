@@ -1375,7 +1375,7 @@
   </h2>
   <p class="cta-sub">A printable calendar. A shared rhythm. An ancient clock that belongs to no one and therefore belongs to you.</p>
   <div class="cta-buttons" role="group" aria-label="Download options">
-    <a href="#" class="cta-btn" role="button">Download Calendar (PDF)</a>
+    <a href="#" class="cta-btn" role="button" id="downloadPdfBtn" onclick="event.preventDefault(); generateCalendarPDF();">Download Calendar (PDF)</a>
     <a href="#" class="cta-btn btn-purple" role="button">Send to a Friend</a>
   </div>
   <div class="cta-moon-bg" aria-hidden="true">☾</div>
@@ -1655,6 +1655,102 @@
     const estrangeEl = document.getElementById('date-blue-moon-estrange');
     if (foundEl) foundEl.textContent = 'Next: ' + blueFmt + ' (' + daysUntilBlue + ' days)';
     if (estrangeEl) estrangeEl.textContent = blueFmt + ' – ' + blueEndFmt;
+  }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script>
+  function generateCalendarPDF() {
+    const { jsPDF } = window.jspdf;
+    // Letter size: 215.9 x 279.4 mm
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+    const pw = 215.9;
+    const ph = 279.4;
+    const margin = 12;
+    const usable = pw - margin * 2;
+
+    // ========== COLORS ==========
+    const black = [0, 0, 0];
+
+    // ========== HELPER: draw a table grid ==========
+    function drawGrid(startX, startY, cols, rows, cellW, cellH, headers) {
+      doc.setDrawColor(...black);
+      doc.setLineWidth(0.6);
+
+      const totalW = cols * cellW;
+      const headerH = 8;
+
+      // Header row
+      if (headers && headers.length) {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(startX, startY, totalW, headerH);
+        // Header cells
+        for (let c = 0; c < cols; c++) {
+          const cx = startX + c * cellW;
+          doc.rect(cx, startY, cellW, headerH);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9);
+          doc.text(headers[c], cx + cellW / 2, startY + headerH / 2 + 1, { align: 'center' });
+        }
+      }
+
+      const bodyY = startY + (headers ? headerH : 0);
+
+      // Body rows
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cx = startX + c * cellW;
+          const cy = bodyY + r * cellH;
+          doc.rect(cx, cy, cellW, cellH);
+        }
+      }
+
+      return bodyY + rows * cellH;
+    }
+
+    // ========== TITLE: "Month" in gothic style ==========
+    // jsPDF doesn't have blackletter, so we use bold + large size to approximate
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(42);
+    doc.setTextColor(...black);
+    doc.text('Month', pw / 2, margin + 14, { align: 'center' });
+
+    // ========== CALENDAR GRID ==========
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const calTop = margin + 22;
+    const cellW = usable / 7;
+    const cellH = 22;
+
+    const calBottom = drawGrid(margin, calTop, 7, 5, cellW, cellH, days);
+
+    // ========== MOON PHASE SECTION ==========
+    const moonTop = calBottom + 10;
+    const moonLabels = ['Full', 'Waning', 'New', 'Waxing'];
+    const moonCellW = usable / 4;
+    const moonHeaderH = 14;
+    const moonBodyH = 32;
+
+    // Outer border around the whole moon section
+    doc.setLineWidth(0.6);
+    doc.rect(margin, moonTop, usable, moonHeaderH + moonBodyH);
+
+    // Header cells with labels
+    for (let i = 0; i < 4; i++) {
+      const cx = margin + i * moonCellW;
+      doc.rect(cx, moonTop, moonCellW, moonHeaderH);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text(moonLabels[i], cx + moonCellW / 2, moonTop + moonHeaderH / 2 + 2, { align: 'center' });
+    }
+
+    // Body cells (empty, for writing)
+    for (let i = 0; i < 4; i++) {
+      const cx = margin + i * moonCellW;
+      doc.rect(cx, moonTop + moonHeaderH, moonCellW, moonBodyH);
+    }
+
+    // ========== SAVE ==========
+    doc.save('keep-different-time-calendar.pdf');
   }
 </script>
 
