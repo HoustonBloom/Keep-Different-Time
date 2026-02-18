@@ -955,10 +955,10 @@
     /* blue-to-purple gradient */
     background: linear-gradient(135deg, var(--night) 0%, var(--purple-deep) 100%);
     border: 1px solid rgba(124,58,237,0.3);
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.4rem;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 3px 3px 0 rgba(0,0,0,0.25), 0 0 15px rgba(37,99,235,0.08);
@@ -975,20 +975,27 @@
     outline-offset: 3px;
   }
 
-  .moon-widget-icon { font-size: 1.3rem; }
+  .moon-widget-icon { font-size: 2rem; }
 
   .moon-widget-text {
-    color: #e2e8f0; /* high contrast */
+    color: #e2e8f0;
     font-family: 'VT323', monospace;
-    font-size: 0.75rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    line-height: 1.3;
+    line-height: 1.4;
   }
 
   .moon-widget-phase {
-    color: #c4b5fd; /* purple-300 */
+    color: #c4b5fd;
     display: block;
+  }
+
+  .moon-widget-countdown {
+    color: #93c5fd;
+    display: block;
+    font-size: 0.9rem;
+    margin-top: 0.15rem;
   }
 
   /* ========== ANIMATIONS ========== */
@@ -1264,11 +1271,12 @@
   <div class="footer-right" aria-hidden="true">☾ keep different time ☾</div>
 </footer>
 
-<div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Current moon phase">
+<div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Current moon phase and next event countdown">
   <span class="moon-widget-icon" id="moonIcon" aria-hidden="true">◑</span>
   <div class="moon-widget-text">
     <span id="moonLabel">Loading...</span>
     <span class="moon-widget-phase" id="moonPhase"></span>
+    <span class="moon-widget-countdown" id="moonCountdown"></span>
   </div>
 </div>
 
@@ -1323,31 +1331,97 @@
     if (e.key === 'ArrowLeft') { ls.scrollLeft -= 150; e.preventDefault(); }
   });
 
-  function getMoonPhase() {
-    const d = new Date();
-    let y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
-    if (m < 3) { y--; m += 12; }
-    m++;
-    let jd = 365.25 * y + 30.6 * m + day - 694039.09;
-    jd /= 29.5305882;
-    let b = Math.round((jd - Math.floor(jd)) * 8);
-    if (b >= 8) b = 0;
-    return [
-      { icon: '🌑', name: 'New Moon', prompt: 'Who needs help today?' },
-      { icon: '🌒', name: 'Waxing Crescent', prompt: 'What joy are you seeking?' },
-      { icon: '🌓', name: 'First Quarter', prompt: 'What joy are you seeking?' },
-      { icon: '🌔', name: 'Waxing Gibbous', prompt: 'What joy are you seeking?' },
-      { icon: '🌕', name: 'Full Moon', prompt: 'Who are you gathering with?' },
-      { icon: '🌖', name: 'Waning Gibbous', prompt: 'What are you learning?' },
-      { icon: '🌗', name: 'Last Quarter', prompt: 'What are you learning?' },
-      { icon: '🌘', name: 'Waning Crescent', prompt: 'What are you learning?' }
-    ][b];
+  // Lunar synodic month ~29.53059 days
+  // Known new moon reference: Jan 6 2000 18:14 UTC
+  const SYNODIC = 29.53058867;
+  const REF_NEW_MOON = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+
+  function getMoonAge(date) {
+    const diff = (date.getTime() - REF_NEW_MOON.getTime()) / (1000 * 60 * 60 * 24);
+    return ((diff % SYNODIC) + SYNODIC) % SYNODIC;
   }
 
-  const phase = getMoonPhase();
+  function getMoonPhase(date) {
+    const age = getMoonAge(date || new Date());
+    const phases = [
+      { icon: '🌑', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens', prompt: 'Who needs help today?', start: 0, end: 1.85 },
+      { icon: '🌒', name: 'Waxing Crescent', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 1.85, end: 7.38 },
+      { icon: '🌓', name: 'First Quarter', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 7.38, end: 11.07 },
+      { icon: '🌔', name: 'Waxing Gibbous', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 11.07, end: 14.77 },
+      { icon: '🌕', name: 'Full Moon', sabbath: 'Feast & Share Plenty', prompt: 'Who are you gathering with?', start: 14.77, end: 16.61 },
+      { icon: '🌖', name: 'Waning Gibbous', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 16.61, end: 22.15 },
+      { icon: '🌗', name: 'Last Quarter', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 22.15, end: 25.84 },
+      { icon: '🌘', name: 'Waning Crescent', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 25.84, end: SYNODIC }
+    ];
+    return phases.find(p => age >= p.start && age < p.end) || phases[0];
+  }
+
+  // Get next key lunar events (new moon, first quarter, full moon, last quarter)
+  function getNextKeyPhaseDate(date) {
+    const age = getMoonAge(date);
+    // Key phase boundaries in days from new moon
+    const keyPhases = [
+      { day: 0, icon: '🌑', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens' },
+      { day: SYNODIC * 0.25, icon: '🌓', name: 'First Quarter', sabbath: 'Seek Queer Joy' },
+      { day: SYNODIC * 0.5, icon: '🌕', name: 'Full Moon', sabbath: 'Feast & Share Plenty' },
+      { day: SYNODIC * 0.75, icon: '🌗', name: 'Last Quarter', sabbath: 'Learn Our History' }
+    ];
+    for (const phase of keyPhases) {
+      if (phase.day > age) {
+        const daysUntil = phase.day - age;
+        const eventDate = new Date(date.getTime() + daysUntil * 24 * 60 * 60 * 1000);
+        return { ...phase, daysUntil: Math.ceil(daysUntil), date: eventDate };
+      }
+    }
+    // Next new moon
+    const daysUntil = SYNODIC - age;
+    const eventDate = new Date(date.getTime() + daysUntil * 24 * 60 * 60 * 1000);
+    return { ...keyPhases[0], daysUntil: Math.ceil(daysUntil), date: eventDate };
+  }
+
+  // Solar feasts for current and next year
+  function getSolarFeasts(year) {
+    // Approximate equinox/solstice dates (good enough for a calendar widget)
+    return [
+      { date: new Date(year, 2, 20), name: 'Spring Equinox', sabbath: 'Feast of Transition', icon: '🌸' },
+      { date: new Date(year, 5, 21), name: 'Summer Solstice', sabbath: 'Feast of Joy', icon: '☀️' },
+      { date: new Date(year, 8, 22), name: 'Fall Equinox', sabbath: 'Feast of the Elders', icon: '🍂' },
+      { date: new Date(year, 11, 21), name: 'Winter Solstice', sabbath: 'Feast of Woes', icon: '❄️' }
+    ];
+  }
+
+  function getNextEvent(date) {
+    const now = date || new Date();
+    const nextPhase = getNextKeyPhaseDate(now);
+
+    // Check solar feasts this year and next
+    const feasts = [...getSolarFeasts(now.getFullYear()), ...getSolarFeasts(now.getFullYear() + 1)];
+    const nextFeast = feasts.find(f => f.date > now);
+
+    // Return whichever is sooner
+    if (nextFeast && nextFeast.date < nextPhase.date) {
+      const daysUntil = Math.ceil((nextFeast.date - now) / (1000 * 60 * 60 * 24));
+      return { type: 'solar', daysUntil, ...nextFeast };
+    }
+    return { type: 'lunar', ...nextPhase };
+  }
+
+  const now = new Date();
+  const phase = getMoonPhase(now);
+  const next = getNextEvent(now);
+
   document.getElementById('moonIcon').textContent = phase.icon;
   document.getElementById('moonLabel').textContent = phase.name;
   document.getElementById('moonPhase').textContent = phase.prompt;
+
+  const countdownEl = document.getElementById('moonCountdown');
+  if (next.daysUntil <= 1) {
+    countdownEl.textContent = next.type === 'solar'
+      ? '→ ' + next.sabbath + ' is tomorrow!'
+      : '→ ' + next.sabbath + ' is tomorrow!';
+  } else {
+    countdownEl.textContent = '→ ' + next.sabbath + ' in ' + next.daysUntil + ' days';
+  }
 </script>
 
 </body>
