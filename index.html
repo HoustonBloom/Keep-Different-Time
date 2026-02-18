@@ -292,6 +292,78 @@
       );
     color: var(--frost);
     border-bottom: 2px solid var(--purple-vivid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Floating moon symbols — parallax depth layers */
+  .argument::before,
+  .argument::after {
+    position: absolute;
+    font-size: 12rem;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+  }
+
+  .argument::before {
+    content: '☾';
+    top: 8%;
+    right: -2rem;
+    color: var(--purple-bright);
+    animation: float-drift-1 18s ease-in-out infinite;
+  }
+
+  .argument::after {
+    content: '○';
+    bottom: 12%;
+    left: -1rem;
+    font-size: 8rem;
+    color: var(--blue-bright);
+    animation: float-drift-2 22s ease-in-out infinite;
+  }
+
+  @keyframes float-drift-1 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+  }
+
+  @keyframes float-drift-2 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(20px) rotate(-3deg); }
+  }
+
+  /* Star-field shimmer dots */
+  .arg-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .arg-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--purple-light);
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  .arg-star:nth-child(1) { top: 8%; left: 15%; animation-delay: 0s; }
+  .arg-star:nth-child(2) { top: 22%; right: 20%; animation-delay: 0.7s; }
+  .arg-star:nth-child(3) { top: 45%; left: 80%; animation-delay: 1.4s; }
+  .arg-star:nth-child(4) { top: 60%; left: 25%; animation-delay: 0.3s; }
+  .arg-star:nth-child(5) { top: 75%; right: 35%; animation-delay: 2.1s; }
+  .arg-star:nth-child(6) { top: 35%; left: 55%; animation-delay: 1.8s; }
+  .arg-star:nth-child(7) { top: 88%; left: 70%; animation-delay: 0.5s; }
+  .arg-star:nth-child(8) { top: 15%; left: 45%; animation-delay: 2.5s; }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.8); }
   }
 
   .arg-panel {
@@ -301,6 +373,7 @@
     cursor: pointer;
     overflow: hidden;
     transition: background 0.3s ease;
+    z-index: 1;
   }
 
   .arg-panel:hover { background: rgba(255,255,255,0.03); }
@@ -323,13 +396,26 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transition: transform 0.1s linear;
+    will-change: transform;
   }
 
   .arg-headline {
     font-size: clamp(1.4rem, 3.5vw, 2.4rem);
     line-height: 1.15;
     max-width: 700px;
-    transition: margin-bottom 0.4s ease;
+    transition: margin-bottom 0.4s ease, transform 0.6s ease, opacity 0.6s ease;
+  }
+
+  /* Parallax slide-in for headlines */
+  .arg-headline.parallax-ready {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  .arg-headline.parallax-visible {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .arg-headline .font-a { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; }
@@ -1071,6 +1157,12 @@
 </section>
 
 <section class="argument" id="argument" aria-labelledby="arg-heading">
+  <div class="arg-stars" aria-hidden="true">
+    <span class="arg-star"></span><span class="arg-star"></span>
+    <span class="arg-star"></span><span class="arg-star"></span>
+    <span class="arg-star"></span><span class="arg-star"></span>
+    <span class="arg-star"></span><span class="arg-star"></span>
+  </div>
   <h2 id="arg-heading" class="sr-only">Why keep different time</h2>
 
   <div class="arg-panel" role="button" tabindex="0" aria-expanded="false" onclick="toggleArg(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleArg(this)}">
@@ -1330,6 +1422,47 @@
     if (e.key === 'ArrowRight') { ls.scrollLeft += 150; e.preventDefault(); }
     if (e.key === 'ArrowLeft') { ls.scrollLeft -= 150; e.preventDefault(); }
   });
+
+  // ========== MANIFESTO PARALLAX ==========
+  if (!prefersReducedMotion) {
+    // Headline slide-in
+    const argHeadlines = document.querySelectorAll('.arg-headline');
+    argHeadlines.forEach(h => h.classList.add('parallax-ready'));
+
+    const headlineObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('parallax-visible');
+          headlineObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    argHeadlines.forEach(h => headlineObs.observe(h));
+
+    // Number parallax — numbers drift upward slower than scroll
+    const argNums = document.querySelectorAll('.arg-num');
+    let ticking = false;
+
+    function updateParallax() {
+      const scrollY = window.scrollY;
+      argNums.forEach(num => {
+        const panel = num.closest('.arg-panel');
+        const rect = panel.getBoundingClientRect();
+        const panelCenter = rect.top + rect.height / 2;
+        const viewCenter = window.innerHeight / 2;
+        const offset = (panelCenter - viewCenter) * 0.15;
+        num.style.transform = 'translateY(' + offset + 'px)';
+      });
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    }, { passive: true });
+  }
 
   // Lunar synodic month ~29.53059 days
   // Known new moon reference: Jan 6 2000 18:14 UTC
