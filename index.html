@@ -210,6 +210,7 @@
     text-decoration: line-through;
     text-decoration-color: #94a3b8;
     text-decoration-thickness: 2px;
+    margin-top: 4rem;
     margin-bottom: 1.5rem;
     line-height: 2;
     max-width: 750px;
@@ -1660,97 +1661,114 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script>
-  function generateCalendarPDF() {
-    const { jsPDF } = window.jspdf;
-    // Letter size: 215.9 x 279.4 mm
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
-    const pw = 215.9;
-    const ph = 279.4;
-    const margin = 12;
-    const usable = pw - margin * 2;
+  // Cache the gothic font so we only fetch once
+  let _gothicFontBase64 = null;
 
-    // ========== COLORS ==========
-    const black = [0, 0, 0];
+  async function loadGothicFont() {
+    if (_gothicFontBase64) return _gothicFontBase64;
+    const res = await fetch('https://fonts.gstatic.com/s/unifrakturmaguntia/v22/WWXPlieVYwiGNomYU-ciRLRvEmK7oaVunw.ttf');
+    const buf = await res.arrayBuffer();
+    // Convert ArrayBuffer to base64
+    const bytes = new Uint8Array(buf);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    _gothicFontBase64 = btoa(binary);
+    return _gothicFontBase64;
+  }
 
-    // ========== HELPER: draw a table grid ==========
-    function drawGrid(startX, startY, cols, rows, cellW, cellH, headers) {
+  async function generateCalendarPDF() {
+    const btn = document.getElementById('downloadPdfBtn');
+    const origText = btn.textContent;
+    btn.textContent = 'Generating...';
+
+    try {
+      const fontBase64 = await loadGothicFont();
+      const { jsPDF } = window.jspdf;
+
+      // Letter size: 215.9 x 279.4 mm
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+      const pw = 215.9;
+      const ph = 279.4;
+      const margin = 14;
+      const usable = pw - margin * 2;
+
+      // Register the gothic font
+      doc.addFileToVFS('UnifrakturMaguntia.ttf', fontBase64);
+      doc.addFont('UnifrakturMaguntia.ttf', 'Gothic', 'normal');
+
+      const black = [0, 0, 0];
       doc.setDrawColor(...black);
-      doc.setLineWidth(0.6);
+      doc.setTextColor(...black);
 
-      const totalW = cols * cellW;
-      const headerH = 8;
+      // ========== TITLE: "Month" in blackletter ==========
+      doc.setFont('Gothic', 'normal');
+      doc.setFontSize(48);
+      doc.text('Month', pw / 2, margin + 16, { align: 'center' });
 
-      // Header row
-      if (headers && headers.length) {
-        doc.setFillColor(255, 255, 255);
-        doc.rect(startX, startY, totalW, headerH);
-        // Header cells
-        for (let c = 0; c < cols; c++) {
-          const cx = startX + c * cellW;
-          doc.rect(cx, startY, cellW, headerH);
-          doc.setFont('helvetica', 'bold');
-          doc.setFontSize(9);
-          doc.text(headers[c], cx + cellW / 2, startY + headerH / 2 + 1, { align: 'center' });
-        }
+      // ========== CALENDAR GRID ==========
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const calTop = margin + 24;
+      const cellW = usable / 7;
+      const headerH = 9;
+      const cellH = 24;
+
+      doc.setLineWidth(0.5);
+
+      // Header row with day names in gothic
+      for (let c = 0; c < 7; c++) {
+        const cx = margin + c * cellW;
+        doc.rect(cx, calTop, cellW, headerH);
+        doc.setFont('Gothic', 'normal');
+        doc.setFontSize(11);
+        doc.text(days[c], cx + cellW / 2, calTop + headerH / 2 + 1.5, { align: 'center' });
       }
 
-      const bodyY = startY + (headers ? headerH : 0);
-
-      // Body rows
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const cx = startX + c * cellW;
-          const cy = bodyY + r * cellH;
+      // 5 body rows
+      const bodyTop = calTop + headerH;
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 7; c++) {
+          const cx = margin + c * cellW;
+          const cy = bodyTop + r * cellH;
           doc.rect(cx, cy, cellW, cellH);
         }
       }
 
-      return bodyY + rows * cellH;
+      const calBottom = bodyTop + 5 * cellH;
+
+      // ========== MOON PHASE SECTION ==========
+      const moonTop = calBottom + 8;
+      const moonLabels = ['Full', 'Waning', 'New', 'Waxing'];
+      const moonCellW = usable / 4;
+      const moonHeaderH = 16;
+      const moonBodyH = 36;
+
+      // Outer border
+      doc.setLineWidth(0.5);
+      doc.rect(margin, moonTop, usable, moonHeaderH + moonBodyH);
+
+      // Header cells with moon phase labels in gothic
+      for (let i = 0; i < 4; i++) {
+        const cx = margin + i * moonCellW;
+        doc.rect(cx, moonTop, moonCellW, moonHeaderH);
+        doc.setFont('Gothic', 'normal');
+        doc.setFontSize(16);
+        doc.text(moonLabels[i], cx + moonCellW / 2, moonTop + moonHeaderH / 2 + 2.5, { align: 'center' });
+      }
+
+      // Body cells (empty, for notes)
+      for (let i = 0; i < 4; i++) {
+        const cx = margin + i * moonCellW;
+        doc.rect(cx, moonTop + moonHeaderH, moonCellW, moonBodyH);
+      }
+
+      // ========== SAVE ==========
+      doc.save('keep-different-time-calendar.pdf');
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      alert('Could not generate PDF. Please try again.');
+    } finally {
+      btn.textContent = origText;
     }
-
-    // ========== TITLE: "Month" in gothic style ==========
-    // jsPDF doesn't have blackletter, so we use bold + large size to approximate
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(42);
-    doc.setTextColor(...black);
-    doc.text('Month', pw / 2, margin + 14, { align: 'center' });
-
-    // ========== CALENDAR GRID ==========
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const calTop = margin + 22;
-    const cellW = usable / 7;
-    const cellH = 22;
-
-    const calBottom = drawGrid(margin, calTop, 7, 5, cellW, cellH, days);
-
-    // ========== MOON PHASE SECTION ==========
-    const moonTop = calBottom + 10;
-    const moonLabels = ['Full', 'Waning', 'New', 'Waxing'];
-    const moonCellW = usable / 4;
-    const moonHeaderH = 14;
-    const moonBodyH = 32;
-
-    // Outer border around the whole moon section
-    doc.setLineWidth(0.6);
-    doc.rect(margin, moonTop, usable, moonHeaderH + moonBodyH);
-
-    // Header cells with labels
-    for (let i = 0; i < 4; i++) {
-      const cx = margin + i * moonCellW;
-      doc.rect(cx, moonTop, moonCellW, moonHeaderH);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
-      doc.text(moonLabels[i], cx + moonCellW / 2, moonTop + moonHeaderH / 2 + 2, { align: 'center' });
-    }
-
-    // Body cells (empty, for writing)
-    for (let i = 0; i < 4; i++) {
-      const cx = margin + i * moonCellW;
-      doc.rect(cx, moonTop + moonHeaderH, moonCellW, moonBodyH);
-    }
-
-    // ========== SAVE ==========
-    doc.save('keep-different-time-calendar.pdf');
   }
 </script>
 
