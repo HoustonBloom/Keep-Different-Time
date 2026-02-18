@@ -634,7 +634,20 @@
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: #6d28d9; /* purple-700: 5.4:1 on white */
+    margin-bottom: 0.15rem;
+  }
+
+  .feast-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--slate);
     margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .moon-card .feast-date {
+    color: #93c5fd;
+    font-size: 0.7rem;
   }
 
   .feast-name {
@@ -717,20 +730,21 @@
   }
 
   .moon-symbol {
-    font-size: 2.5rem;
+    font-size: 3.2rem;
     margin-bottom: 1rem;
     display: block;
     line-height: 1;
     color: var(--purple-light); /* decorative, also visible */
+    text-shadow: 0 0 12px rgba(167,139,250,0.3);
   }
 
   .moon-phase-label {
     font-family: 'VT323', monospace;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    color: #93c5fd; /* blue-300: ~8:1 on void */
-    margin-bottom: 0.5rem;
+    color: #e2e8f0; /* ice: ~13:1 on void */
+    margin-bottom: 0.15rem;
   }
 
   .moon-card:nth-child(1) .feast-name { font-family: 'Courier Prime', monospace; font-weight: 700; }
@@ -1232,21 +1246,25 @@
     <div class="feast-collage" role="list">
       <article class="feast-card reveal reveal-stagger-1" role="listitem" tabindex="0">
         <div class="feast-season">Spring Equinox</div>
+        <div class="feast-date" id="date-spring"></div>
         <div class="feast-name">The Feast of Transition</div>
         <div class="feast-desc">To celebrate coming out — in all its forms. Light crosses into dominance. The earth itself is emerging from dormancy.</div>
       </article>
       <article class="feast-card reveal reveal-stagger-2" role="listitem" tabindex="0">
         <div class="feast-season">Summer Solstice</div>
+        <div class="feast-date" id="date-summer"></div>
         <div class="feast-name">The Feast of Joy</div>
         <div class="feast-desc">To celebrate living outside the closet and outside the lines. Maximum light, minimum shadow. Be fully, completely seen.</div>
       </article>
       <article class="feast-card reveal reveal-stagger-3" role="listitem" tabindex="0">
         <div class="feast-season">Fall Equinox</div>
+        <div class="feast-date" id="date-fall"></div>
         <div class="feast-name">The Feast of the Elders</div>
         <div class="feast-desc">To honor our heritage, our ancestors, and the ones who planted what we're harvesting now. We reap what others sowed.</div>
       </article>
       <article class="feast-card reveal reveal-stagger-4" role="listitem" tabindex="0">
         <div class="feast-season">Winter Solstice</div>
+        <div class="feast-date" id="date-winter"></div>
         <div class="feast-name">The Feast of Woes</div>
         <div class="feast-desc">To mock our oppressors and mourn the closet. The longest night holds both grief and subversive laughter.</div>
       </article>
@@ -1265,13 +1283,15 @@
         <article class="moon-card" role="listitem" tabindex="0">
           <span class="moon-symbol" aria-hidden="true">●</span>
           <div class="moon-phase-label">New Moon</div>
+          <div class="feast-date" id="date-new-moon"></div>
           <div class="feast-name">Bear Each Other's Burdens</div>
           <div class="feast-desc">Charity work. Service days. Mutual aid in darkness, without audience.</div>
           <div class="moon-prompt"><span>prompt:</span> Who needs help? What can you offer?</div>
         </article>
         <article class="moon-card" role="listitem" tabindex="0">
           <span class="moon-symbol" aria-hidden="true">◑</span>
-          <div class="moon-phase-label">Waxing Moon</div>
+          <div class="moon-phase-label">First Quarter</div>
+          <div class="feast-date" id="date-first-quarter"></div>
           <div class="feast-name">Seek Queer Joy</div>
           <div class="feast-desc">Light building, energy rising. Go find what makes you feel alive.</div>
           <div class="moon-prompt"><span>prompt:</span> What brings you joy? Where will you go looking?</div>
@@ -1279,13 +1299,15 @@
         <article class="moon-card" role="listitem" tabindex="0">
           <span class="moon-symbol" aria-hidden="true">○</span>
           <div class="moon-phase-label">Full Moon</div>
+          <div class="feast-date" id="date-full-moon"></div>
           <div class="feast-name">Feast & Share Plenty</div>
           <div class="feast-desc">Maximum illumination. Gather. Eat together. Share what you have.</div>
           <div class="moon-prompt"><span>prompt:</span> Where are we meeting? What did you bring?</div>
         </article>
         <article class="moon-card" role="listitem" tabindex="0">
           <span class="moon-symbol" aria-hidden="true">◐</span>
-          <div class="moon-phase-label">Waning Moon</div>
+          <div class="moon-phase-label">Last Quarter</div>
+          <div class="feast-date" id="date-last-quarter"></div>
           <div class="feast-name">Learn Our History</div>
           <div class="feast-desc">Light turning inward. Study. Read. Listen to the ones who came before.</div>
           <div class="moon-prompt"><span>prompt:</span> What are you learning? Who's teaching you?</div>
@@ -1555,6 +1577,46 @@
   } else {
     countdownEl.textContent = '→ ' + next.sabbath + ' in ' + next.daysUntil + ' days';
   }
+
+  // ========== POPULATE DATES ==========
+  const fmtDate = (d) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const yr = now.getFullYear();
+
+  // Solar feast dates (current year, or next year if already passed)
+  const solarDates = [
+    { id: 'date-spring', date: new Date(yr, 2, 20) },
+    { id: 'date-summer', date: new Date(yr, 5, 20) },
+    { id: 'date-fall', date: new Date(yr, 8, 22) },
+    { id: 'date-winter', date: new Date(yr, 11, 21) }
+  ];
+  solarDates.forEach(s => {
+    const d = s.date < now ? new Date(yr + 1, s.date.getMonth(), s.date.getDate()) : s.date;
+    const el = document.getElementById(s.id);
+    if (el) el.textContent = fmtDate(d);
+  });
+
+  // Next occurrence of each key moon phase
+  function getNextPhaseDate(targetFraction) {
+    const age = getMoonAge(now);
+    const targetDay = SYNODIC * targetFraction;
+    let daysUntil = targetDay - age;
+    if (daysUntil <= 0) daysUntil += SYNODIC;
+    return new Date(now.getTime() + daysUntil * 24 * 60 * 60 * 1000);
+  }
+
+  const moonDates = [
+    { id: 'date-new-moon', fraction: 0 },
+    { id: 'date-first-quarter', fraction: 0.25 },
+    { id: 'date-full-moon', fraction: 0.5 },
+    { id: 'date-last-quarter', fraction: 0.75 }
+  ];
+  moonDates.forEach(m => {
+    const el = document.getElementById(m.id);
+    if (el) {
+      const d = getNextPhaseDate(m.fraction);
+      el.textContent = 'Next: ' + fmtDate(d);
+    }
+  });
 </script>
 
 </body>
