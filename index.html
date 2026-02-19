@@ -696,9 +696,36 @@
     margin-bottom: 1rem;
     display: block;
     line-height: 1;
-    color: var(--purple-light); /* decorative, also visible */
-    text-shadow: 0 0 12px rgba(167,139,250,0.3);
+    color: var(--purple-light);
+    text-shadow:
+      0 0 8px rgba(167,139,250,0.5),
+      0 0 20px rgba(167,139,250,0.3),
+      0 0 40px rgba(124,58,237,0.2);
+    animation: moon-glow 3s ease-in-out infinite;
   }
+
+  @keyframes moon-glow {
+    0%, 100% {
+      text-shadow:
+        0 0 8px rgba(167,139,250,0.5),
+        0 0 20px rgba(167,139,250,0.3),
+        0 0 40px rgba(124,58,237,0.2);
+      transform: scale(1);
+    }
+    50% {
+      text-shadow:
+        0 0 12px rgba(167,139,250,0.7),
+        0 0 30px rgba(167,139,250,0.5),
+        0 0 60px rgba(124,58,237,0.3),
+        0 0 80px rgba(96,165,250,0.15);
+      transform: scale(1.08);
+    }
+  }
+
+  .moon-card:nth-child(1) .moon-symbol { animation-delay: 0s; }
+  .moon-card:nth-child(2) .moon-symbol { animation-delay: 0.75s; }
+  .moon-card:nth-child(3) .moon-symbol { animation-delay: 1.5s; }
+  .moon-card:nth-child(4) .moon-symbol { animation-delay: 2.25s; }
 
   .moon-phase-label {
     font-family: 'VT323', monospace;
