@@ -112,6 +112,7 @@
     justify-content: center;
     gap: 4px;
     border-right: 1px solid var(--night);
+    padding-top: 56px;
   }
 
   .side-nav a {
@@ -145,13 +146,20 @@
   .side-nav a.nav-moon {
     font-size: 1.6rem;
     writing-mode: horizontal-tb;
-    padding: 0.8rem 0;
+    padding: 0.85rem 0;
     opacity: 1;
     color: var(--purple-light);
     text-decoration: none;
     border-left: 2px solid transparent;
     letter-spacing: 0;
-    order: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
     text-shadow:
       0 0 8px rgba(167,139,250,0.4),
       0 0 16px rgba(167,139,250,0.2);
