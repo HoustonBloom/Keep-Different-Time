@@ -2545,9 +2545,8 @@
 
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Reset for next use
+    // Reset for next use, then scroll to top after overlay is fully gone
     setTimeout(function() {
       instructions.classList.remove('visible');
       moon.style.display = '';
@@ -2563,6 +2562,8 @@
       document.getElementById('dlTabInstr').setAttribute('aria-selected', 'true');
       document.querySelectorAll('.dl-tab-panel').forEach(function(p) { p.classList.remove('active'); });
       document.getElementById('dlPanelInstr').classList.add('active');
+      window.scrollTo(0, 0);
+      document.getElementById('hero').scrollIntoView();
     }, 700);
   });
 
@@ -2652,7 +2653,6 @@
     var overlay = document.getElementById('shareOverlay');
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     setTimeout(function() {
       var sun = document.getElementById('shareSun');
@@ -2674,6 +2674,8 @@
       corona.style.transition = '';
       document.getElementById('shareLabel').classList.remove('visible');
       document.getElementById('shareStars').innerHTML = '';
+      window.scrollTo(0, 0);
+      document.getElementById('hero').scrollIntoView();
     }, 700);
   });
 </script>
