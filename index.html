@@ -200,6 +200,16 @@
     transform: rotate(2.5deg);
   }
 
+  .hero-moon-img {
+    position: absolute;
+    bottom: -2rem;
+    right: -1rem;
+    width: clamp(320px, 38vw, 520px);
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: darken;
+  }
+
   /* Strikethrough — high contrast version */
   .hero-struck {
     font-family: 'Space Mono', monospace;
@@ -245,6 +255,7 @@
     transform: rotate(-0.5deg);
     color: var(--night);
     position: relative;
+    z-index: 1;
   }
 
   .hero-sub::before {
@@ -1169,6 +1180,7 @@
   <p class="hero-sub">
     The most radical thing you can do is change what clock you live by. This one runs on the moon. No one can own it, sell it, or take it away from you.
   </p>
+  <img src="moon.png" alt="" class="hero-moon-img" aria-hidden="true">
   <div class="scroll-arrow" aria-hidden="true">↓ scroll ↓</div>
 </section>
 
