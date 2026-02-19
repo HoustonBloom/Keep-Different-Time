@@ -1095,6 +1095,29 @@
     margin-top: 0.15rem;
   }
 
+  .moon-widget-close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .moon-widget-close:hover { color: #f1f5f9; }
+
+  .moon-widget.dismissed {
+    transform: translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.4s ease, opacity 0.3s ease;
+  }
+
   /* ========== ANIMATIONS ========== */
   .reveal {
     opacity: 0;
@@ -1377,6 +1400,7 @@
 </footer>
 
 <div class="moon-widget" id="moonWidget" role="status" aria-live="polite" tabindex="0" aria-label="Next calendar event countdown">
+  <button class="moon-widget-close" aria-label="Dismiss moon widget" onclick="document.getElementById('moonWidget').classList.add('dismissed');">×</button>
   <span class="moon-widget-icon" id="moonIcon" aria-hidden="true">◑</span>
   <div class="moon-widget-text">
     <span id="moonLabel">Loading...</span>
