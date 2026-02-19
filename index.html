@@ -1773,14 +1773,14 @@
       bottom: 0.75rem;
       left: 0.75rem;
       z-index: 100;
-      background: linear-gradient(135deg, var(--night) 0%, var(--purple-deep) 100%);
-      border: 1px solid rgba(124,58,237,0.3);
+      background: linear-gradient(135deg, var(--night) 0%, var(--blue-deep) 100%);
+      border: 1px solid rgba(37,99,235,0.3);
       padding: 0.7rem 1rem;
       font-family: 'VT323', monospace;
       font-size: 1rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: var(--purple-light);
+      color: var(--blue-bright);
       text-decoration: none;
       box-shadow: 3px 3px 0 rgba(0,0,0,0.25);
     }
@@ -2042,7 +2042,7 @@
   </div>
 </div>
 
-<a href="#download" class="mobile-dl-btn" aria-label="Jump to download section">↓ Download</a>
+<a href="#download" class="mobile-dl-btn" id="mobileNavBtn" aria-label="Jump to calendar">↓ Calendar</a>
 
 <!-- Download Ceremony Overlay -->
 <div class="dl-overlay" id="dlOverlay" aria-hidden="true" role="dialog" aria-label="Download ceremony">
@@ -2142,6 +2142,17 @@
       // Some glyphs render smaller — adjust sizes to look consistent
       var ch = moonPhases[current];
       navMoon.style.fontSize = (ch === '○' || ch === '◐') ? '2.1rem' : (ch === '☾') ? '1.8rem' : '1.6rem';
+    }
+    // Mobile nav button — swap to "↑ Top" at bottom sections
+    var mBtn = document.getElementById('mobileNavBtn');
+    if (mBtn) {
+      if (current === 'download') {
+        mBtn.href = '#hero';
+        mBtn.textContent = '↑ Top';
+      } else {
+        mBtn.href = '#download';
+        mBtn.textContent = '↓ Calendar';
+      }
     }
   });
 
