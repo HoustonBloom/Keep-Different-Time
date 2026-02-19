@@ -232,11 +232,12 @@
     position: absolute;
     top: 50%;
     right: -2rem;
-    transform: translateY(-50%);
+    transform: translateY(-50%) rotate(0deg);
     width: clamp(260px, 42vw, 580px);
     pointer-events: none;
     z-index: 0;
     mix-blend-mode: darken;
+    will-change: transform;
   }
 
   /* Strikethrough — high contrast version */
@@ -1214,6 +1215,204 @@
   .reveal-stagger-3 { transition-delay: 0.15s; }
   .reveal-stagger-4 { transition-delay: 0.2s; }
 
+  /* ========== DOWNLOAD CEREMONY ========== */
+  .dl-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .dl-overlay.active {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .dl-overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--void);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .dl-overlay.active .dl-overlay-bg { opacity: 1; }
+
+  .dl-moon {
+    font-size: 8rem;
+    color: var(--purple-light);
+    position: relative;
+    z-index: 1;
+    text-shadow:
+      0 0 20px rgba(167,139,250,0.5),
+      0 0 60px rgba(167,139,250,0.3),
+      0 0 100px rgba(124,58,237,0.2);
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  .dl-overlay.active .dl-moon {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.6s;
+  }
+
+  .dl-phase-label {
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    color: var(--purple-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    position: relative;
+    z-index: 1;
+    margin-top: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .dl-overlay.active .dl-phase-label {
+    opacity: 1;
+    transition-delay: 0.8s;
+  }
+
+  .dl-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .dl-stars span {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--purple-light);
+    border-radius: 50%;
+    opacity: 0;
+    animation: dl-star-in 0.4s ease forwards;
+  }
+
+  @keyframes dl-star-in {
+    0% { opacity: 0; transform: scale(0); }
+    100% { opacity: 0.6; transform: scale(1); }
+  }
+
+  /* Instruction screen */
+  .dl-instructions {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    text-align: center;
+    padding: 0 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+
+  .dl-instructions.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .dl-instructions h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    text-transform: uppercase;
+    color: var(--frost);
+    margin-bottom: 2rem;
+  }
+
+  .dl-instructions h3 em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--purple-light);
+    text-transform: none;
+  }
+
+  .dl-step-list {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 2.5rem;
+  }
+
+  .dl-step-list li {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #cbd5e1;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(167,139,250,0.08);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .dl-step-list li:last-child { border-bottom: none; }
+
+  .dl-step-num {
+    font-family: 'VT323', monospace;
+    font-size: 1.8rem;
+    color: var(--purple-vivid);
+    line-height: 1;
+    min-width: 1.5rem;
+  }
+
+  .dl-dates {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(167,139,250,0.15);
+    background: rgba(124,58,237,0.06);
+    text-align: left;
+  }
+
+  .dl-dates h4 {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: var(--purple-light);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+  }
+
+  .dl-dates-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+  }
+
+  .dl-dates-grid .phase-icon { color: var(--purple-light); font-size: 1rem; }
+
+  .dl-close-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border: 2px solid var(--purple-bright);
+    background: rgba(124,58,237,0.15);
+    color: var(--purple-light);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-top: 1rem;
+  }
+
+  .dl-close-btn:hover {
+    background: var(--purple-vivid);
+    color: white;
+    box-shadow: 0 0 25px rgba(124,58,237,0.3);
+  }
+
   /* ========== MOBILE ========== */
   @media (max-width: 768px) {
     .side-nav { display: none; }
@@ -1448,7 +1647,7 @@
   </h2>
   <p class="cta-sub">A printable calendar. A shared rhythm. An ancient clock that belongs to no one and therefore belongs to you.</p>
   <div class="cta-buttons" role="group" aria-label="Download options">
-    <a href="#" class="cta-btn" role="button" id="downloadPdfBtn" onclick="event.preventDefault(); generateCalendarPDF();">Download Calendar (PDF)</a>
+    <a href="#" class="cta-btn" role="button" id="downloadPdfBtn" onclick="event.preventDefault(); startDownloadCeremony();">Download Calendar (PDF)</a>
     <a href="#" class="cta-btn btn-purple" role="button">Send to a Friend</a>
   </div>
   <div class="cta-moon-bg" aria-hidden="true">☾</div>
@@ -1469,6 +1668,28 @@
     <span id="moonLabel">Loading...</span>
     <span class="moon-widget-phase" id="moonPhase"></span>
     <span class="moon-widget-countdown" id="moonCountdown"></span>
+  </div>
+</div>
+
+<!-- Download Ceremony Overlay -->
+<div class="dl-overlay" id="dlOverlay" aria-hidden="true" role="dialog" aria-label="Download ceremony">
+  <div class="dl-overlay-bg"></div>
+  <div class="dl-stars" id="dlStars" aria-hidden="true"></div>
+  <div class="dl-moon" id="dlMoon" aria-hidden="true">●</div>
+  <div class="dl-phase-label" id="dlPhaseLabel">New Moon</div>
+  <div class="dl-instructions" id="dlInstructions">
+    <h3>Your calendar is <em>ready</em></h3>
+    <ol class="dl-step-list">
+      <li><span class="dl-step-num">1</span><span>Print it. Pin it somewhere you'll see it every day.</span></li>
+      <li><span class="dl-step-num">2</span><span>Watch the moon. Each phase is a sabbath — a reason to gather, rest, or act.</span></li>
+      <li><span class="dl-step-num">3</span><span>Write what you do. Journal the prompts. Keep a record of keeping time differently.</span></li>
+      <li><span class="dl-step-num">4</span><span>Share it. Invite someone into the rhythm. The calendar belongs to everyone.</span></li>
+    </ol>
+    <div class="dl-dates" id="dlDates">
+      <h4>/// Upcoming Cycle Dates ///</h4>
+      <div class="dl-dates-grid" id="dlDatesGrid"></div>
+    </div>
+    <button class="dl-close-btn" id="dlCloseBtn">Begin Keeping Time</button>
   </div>
 </div>
 
@@ -1572,6 +1793,24 @@
     }, { passive: true });
   }
 
+  // ========== HERO MOON ROTATION ON SCROLL ==========
+  (function() {
+    var moonImg = document.querySelector('.hero-moon-img');
+    if (moonImg) {
+      var moonTick = false;
+      window.addEventListener('scroll', function() {
+        if (!moonTick) {
+          requestAnimationFrame(function() {
+            var deg = window.scrollY * 0.35;
+            moonImg.style.transform = 'translateY(-50%) rotate(' + deg + 'deg)';
+            moonTick = false;
+          });
+          moonTick = true;
+        }
+      }, { passive: true });
+    }
+  })();
+
   // Lunar synodic month ~29.53059 days
   // Known new moon reference: Jan 6 2000 18:14 UTC
   const SYNODIC = 29.53058867;
@@ -1585,14 +1824,14 @@
   function getMoonPhase(date) {
     const age = getMoonAge(date || new Date());
     const phases = [
-      { icon: '🌑', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens', prompt: 'Who needs help today?', start: 0, end: 1.85 },
-      { icon: '🌒', name: 'Waxing Crescent', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 1.85, end: 7.38 },
-      { icon: '🌓', name: 'First Quarter', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 7.38, end: 11.07 },
-      { icon: '🌔', name: 'Waxing Gibbous', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 11.07, end: 14.77 },
-      { icon: '🌕', name: 'Full Moon', sabbath: 'Feast & Share Plenty', prompt: 'Who are you gathering with?', start: 14.77, end: 16.61 },
-      { icon: '🌖', name: 'Waning Gibbous', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 16.61, end: 22.15 },
-      { icon: '🌗', name: 'Last Quarter', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 22.15, end: 25.84 },
-      { icon: '🌘', name: 'Waning Crescent', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 25.84, end: SYNODIC }
+      { icon: '●', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens', prompt: 'Who needs help today?', start: 0, end: 1.85 },
+      { icon: '◑', name: 'Waxing Crescent', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 1.85, end: 7.38 },
+      { icon: '◑', name: 'First Quarter', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 7.38, end: 11.07 },
+      { icon: '◑', name: 'Waxing Gibbous', sabbath: 'Seek Queer Joy', prompt: 'What joy are you seeking?', start: 11.07, end: 14.77 },
+      { icon: '○', name: 'Full Moon', sabbath: 'Feast & Share Plenty', prompt: 'Who are you gathering with?', start: 14.77, end: 16.61 },
+      { icon: '◐', name: 'Waning Gibbous', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 16.61, end: 22.15 },
+      { icon: '◐', name: 'Last Quarter', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 22.15, end: 25.84 },
+      { icon: '◐', name: 'Waning Crescent', sabbath: 'Learn Our History', prompt: 'What are you learning?', start: 25.84, end: SYNODIC }
     ];
     return phases.find(p => age >= p.start && age < p.end) || phases[0];
   }
@@ -1602,10 +1841,10 @@
     const age = getMoonAge(date);
     // Key phase boundaries in days from new moon
     const keyPhases = [
-      { day: 0, icon: '🌑', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens' },
-      { day: SYNODIC * 0.25, icon: '🌓', name: 'First Quarter', sabbath: 'Seek Queer Joy' },
-      { day: SYNODIC * 0.5, icon: '🌕', name: 'Full Moon', sabbath: 'Feast & Share Plenty' },
-      { day: SYNODIC * 0.75, icon: '🌗', name: 'Last Quarter', sabbath: 'Learn Our History' }
+      { day: 0, icon: '●', name: 'New Moon', sabbath: 'Bear Each Other\'s Burdens' },
+      { day: SYNODIC * 0.25, icon: '◑', name: 'First Quarter', sabbath: 'Seek Queer Joy' },
+      { day: SYNODIC * 0.5, icon: '○', name: 'Full Moon', sabbath: 'Feast & Share Plenty' },
+      { day: SYNODIC * 0.75, icon: '◐', name: 'Last Quarter', sabbath: 'Learn Our History' }
     ];
     for (const phase of keyPhases) {
       if (phase.day > age) {
@@ -1624,10 +1863,10 @@
   function getSolarFeasts(year) {
     // Approximate equinox/solstice dates (good enough for a calendar widget)
     return [
-      { date: new Date(year, 2, 20), name: 'Spring Equinox', sabbath: 'Feast of Transition', icon: '🌸' },
-      { date: new Date(year, 5, 21), name: 'Summer Solstice', sabbath: 'Feast of Joy', icon: '☀️' },
-      { date: new Date(year, 8, 22), name: 'Fall Equinox', sabbath: 'Feast of the Elders', icon: '🍂' },
-      { date: new Date(year, 11, 21), name: 'Winter Solstice', sabbath: 'Feast of Woes', icon: '❄️' }
+      { date: new Date(year, 2, 20), name: 'Spring Equinox', sabbath: 'Feast of Transition', icon: '✦' },
+      { date: new Date(year, 5, 21), name: 'Summer Solstice', sabbath: 'Feast of Joy', icon: '✦' },
+      { date: new Date(year, 8, 22), name: 'Fall Equinox', sabbath: 'Feast of the Elders', icon: '✦' },
+      { date: new Date(year, 11, 21), name: 'Winter Solstice', sabbath: 'Feast of Woes', icon: '✦' }
     ];
   }
 
@@ -1739,6 +1978,174 @@
     if (foundEl) foundEl.textContent = 'Next: ' + blueFmt + ' (' + daysUntilBlue + ' days)';
     if (estrangeEl) estrangeEl.textContent = blueFmt + ' – ' + blueEndFmt;
   }
+
+  // ========== DOWNLOAD CEREMONY ==========
+  function startDownloadCeremony() {
+    const overlay = document.getElementById('dlOverlay');
+    const moon = document.getElementById('dlMoon');
+    const label = document.getElementById('dlPhaseLabel');
+    const stars = document.getElementById('dlStars');
+    const instructions = document.getElementById('dlInstructions');
+    const datesGrid = document.getElementById('dlDatesGrid');
+
+    // Reset state
+    overlay.setAttribute('aria-hidden', 'false');
+    instructions.classList.remove('visible');
+    moon.style.opacity = '0';
+    moon.style.transform = 'scale(0.3)';
+    label.style.opacity = '0';
+    stars.innerHTML = '';
+
+    // Activate overlay (fade in background)
+    overlay.classList.add('active');
+
+    // Spawn stars progressively
+    function spawnStar(delay) {
+      setTimeout(function() {
+        var s = document.createElement('span');
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.width = (1 + Math.random() * 2.5) + 'px';
+        s.style.height = s.style.width;
+        s.style.animationDelay = (Math.random() * 0.3) + 's';
+        stars.appendChild(s);
+      }, delay);
+    }
+    for (var i = 0; i < 60; i++) {
+      spawnStar(i * 50);
+    }
+
+    // Moon phase cycle sequence
+    var phases = [
+      { icon: '●', label: 'New Moon', sabbath: 'Bear Each Other\'s Burdens' },
+      { icon: '◑', label: 'First Quarter', sabbath: 'Seek Queer Joy' },
+      { icon: '○', label: 'Full Moon', sabbath: 'Feast & Share Plenty' },
+      { icon: '◐', label: 'Last Quarter', sabbath: 'Learn Our History' },
+      { icon: '●', label: 'New Moon', sabbath: 'The cycle begins again' }
+    ];
+
+    var phaseDelay = 1200; // ms before first phase
+    var phaseDuration = 900; // ms per phase
+
+    phases.forEach(function(phase, idx) {
+      setTimeout(function() {
+        // Transition: shrink, swap, grow
+        moon.style.transition = 'all 0.3s ease';
+        moon.style.transform = 'scale(0.6)';
+        moon.style.opacity = '0.4';
+
+        setTimeout(function() {
+          moon.textContent = phase.icon;
+          label.textContent = phase.label;
+          label.style.opacity = '1';
+          moon.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          moon.style.transform = 'scale(1)';
+          moon.style.opacity = '1';
+
+          // Adjust size for consistent visual weight
+          if (phase.icon === '○' || phase.icon === '◐') {
+            moon.style.fontSize = '9rem';
+          } else if (phase.icon === '●') {
+            moon.style.fontSize = '7.5rem';
+          } else {
+            moon.style.fontSize = '8rem';
+          }
+        }, 300);
+
+      }, phaseDelay + (idx * phaseDuration));
+    });
+
+    // After phase cycle completes, transition to instruction screen
+    var totalPhaseTime = phaseDelay + (phases.length * phaseDuration) + 600;
+
+    setTimeout(function() {
+      // Fade out moon and label
+      moon.style.transition = 'all 0.6s ease';
+      moon.style.opacity = '0';
+      moon.style.transform = 'scale(0.3)';
+      label.style.transition = 'opacity 0.4s ease';
+      label.style.opacity = '0';
+
+      // Populate upcoming dates
+      populateDlDates(datesGrid);
+
+      // Show instructions
+      setTimeout(function() {
+        moon.style.display = 'none';
+        label.style.display = 'none';
+        instructions.classList.add('visible');
+      }, 600);
+
+    }, totalPhaseTime);
+
+    // Trigger PDF download during animation
+    setTimeout(function() {
+      if (typeof generateCalendarPDF === 'function') {
+        generateCalendarPDF();
+      }
+    }, phaseDelay + 400);
+  }
+
+  // Populate upcoming dates in the instruction screen
+  function populateDlDates(grid) {
+    grid.innerHTML = '';
+    var today = new Date();
+    var phaseMap = [
+      { fraction: 0, icon: '●', name: 'New Moon — Bear Each Other\'s Burdens' },
+      { fraction: 0.25, icon: '◑', name: 'First Quarter — Seek Queer Joy' },
+      { fraction: 0.5, icon: '○', name: 'Full Moon — Feast & Share Plenty' },
+      { fraction: 0.75, icon: '◐', name: 'Last Quarter — Learn Our History' }
+    ];
+
+    // Get next 3 full cycles of dates (12 events)
+    var events = [];
+    for (var cycle = 0; cycle < 3; cycle++) {
+      phaseMap.forEach(function(p) {
+        var age = getMoonAge(today);
+        var targetDay = SYNODIC * p.fraction;
+        var daysUntil = targetDay - age + (cycle * SYNODIC);
+        if (cycle === 0 && daysUntil <= 0) daysUntil += SYNODIC;
+        var evDate = new Date(today.getTime() + daysUntil * 24 * 60 * 60 * 1000);
+        events.push({ date: evDate, icon: p.icon, name: p.name });
+      });
+    }
+
+    // Sort by date and take first 8
+    events.sort(function(a, b) { return a.date - b.date; });
+    events.slice(0, 8).forEach(function(ev) {
+      var iconSpan = document.createElement('span');
+      iconSpan.className = 'phase-icon';
+      iconSpan.textContent = ev.icon;
+      grid.appendChild(iconSpan);
+
+      var textSpan = document.createElement('span');
+      textSpan.textContent = ev.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + '  ' + ev.name;
+      grid.appendChild(textSpan);
+    });
+  }
+
+  // Close ceremony
+  document.getElementById('dlCloseBtn').addEventListener('click', function() {
+    var overlay = document.getElementById('dlOverlay');
+    var moon = document.getElementById('dlMoon');
+    var labelEl = document.getElementById('dlPhaseLabel');
+    var instructions = document.getElementById('dlInstructions');
+
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    // Reset for next use
+    setTimeout(function() {
+      instructions.classList.remove('visible');
+      moon.style.display = '';
+      labelEl.style.display = '';
+      moon.style.opacity = '0';
+      moon.style.transform = 'scale(0.3)';
+      moon.style.fontSize = '8rem';
+      labelEl.style.opacity = '0';
+      document.getElementById('dlStars').innerHTML = '';
+    }, 700);
+  });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
