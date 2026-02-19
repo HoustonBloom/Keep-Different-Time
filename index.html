@@ -1303,13 +1303,17 @@
     100% { opacity: 0.6; transform: scale(1); }
   }
 
-  /* Instruction screen */
+  /* Instruction screen — tabbed layout */
   .dl-instructions {
     position: relative;
     z-index: 1;
-    max-width: 600px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
     text-align: center;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.8s ease;
@@ -1323,10 +1327,11 @@
   .dl-instructions h3 {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
     text-transform: uppercase;
     color: var(--frost);
-    margin-bottom: 2rem;
+    margin-bottom: 1.2rem;
+    flex-shrink: 0;
   }
 
   .dl-instructions h3 em {
@@ -1336,21 +1341,70 @@
     text-transform: none;
   }
 
+  /* Tab bar */
+  .dl-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(167,139,250,0.2);
+    flex-shrink: 0;
+  }
+
+  .dl-tab {
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #64748b;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .dl-tab.active {
+    color: var(--purple-light);
+    border-bottom-color: var(--purple-vivid);
+  }
+
+  .dl-tab:hover:not(.active) {
+    color: #94a3b8;
+  }
+
+  /* Tab panels */
+  .dl-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  .dl-tab-panel {
+    display: none;
+  }
+
+  .dl-tab-panel.active {
+    display: block;
+  }
+
   .dl-step-list {
     list-style: none;
     text-align: left;
-    margin-bottom: 2.5rem;
+    margin: 0;
+    padding: 0;
   }
 
   .dl-step-list li {
     font-family: 'Libre Baskerville', serif;
-    font-size: 0.9rem;
-    line-height: 1.8;
+    font-size: 0.85rem;
+    line-height: 1.7;
     color: #cbd5e1;
-    padding: 0.75rem 0;
+    padding: 0.6rem 0;
     border-bottom: 1px solid rgba(167,139,250,0.08);
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: flex-start;
   }
 
@@ -1358,45 +1412,37 @@
 
   .dl-step-num {
     font-family: 'VT323', monospace;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: var(--purple-vivid);
     line-height: 1;
-    min-width: 1.5rem;
-  }
-
-  .dl-dates {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    border: 1px solid rgba(167,139,250,0.15);
-    background: rgba(124,58,237,0.06);
-    text-align: left;
-  }
-
-  .dl-dates h4 {
-    font-family: 'VT323', monospace;
-    font-size: 1rem;
-    color: var(--purple-light);
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    margin-bottom: 1rem;
+    min-width: 1.2rem;
   }
 
   .dl-dates-grid {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.4rem 1rem;
+    gap: 0.5rem 1rem;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
     color: #cbd5e1;
+    text-align: left;
   }
 
   .dl-dates-grid .phase-icon { color: var(--purple-light); font-size: 1rem; }
 
+  /* Footer buttons */
+  .dl-footer {
+    flex-shrink: 0;
+    padding-top: 1.2rem;
+    display: flex;
+    justify-content: center;
+  }
+
   .dl-close-btn {
     display: inline-block;
-    padding: 0.8rem 2rem;
+    padding: 0.7rem 2rem;
     font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     border: 2px solid var(--purple-bright);
@@ -1404,7 +1450,6 @@
     color: var(--purple-light);
     cursor: pointer;
     transition: all 0.15s ease;
-    margin-top: 1rem;
   }
 
   .dl-close-btn:hover {
@@ -1693,17 +1738,26 @@
   <div class="dl-phase-label" id="dlPhaseLabel">New Moon</div>
   <div class="dl-instructions" id="dlInstructions">
     <h3>Your calendar is <em>ready</em></h3>
-    <ol class="dl-step-list">
-      <li><span class="dl-step-num">1</span><span>Print it. Pin it somewhere you'll see it every day.</span></li>
-      <li><span class="dl-step-num">2</span><span>Watch the moon. Each phase is a sabbath — a reason to gather, rest, or act.</span></li>
-      <li><span class="dl-step-num">3</span><span>Write what you do. Journal the prompts. Keep a record of keeping time differently.</span></li>
-      <li><span class="dl-step-num">4</span><span>Share it. Invite someone into the rhythm. The calendar belongs to everyone.</span></li>
-    </ol>
-    <div class="dl-dates" id="dlDates">
-      <h4>/// Upcoming Cycle Dates ///</h4>
-      <div class="dl-dates-grid" id="dlDatesGrid"></div>
+    <div class="dl-tabs" role="tablist">
+      <button class="dl-tab active" role="tab" aria-selected="true" data-tab="instructions" id="dlTabInstr">Instructions</button>
+      <button class="dl-tab" role="tab" aria-selected="false" data-tab="dates" id="dlTabDates">Upcoming Dates</button>
     </div>
-    <button class="dl-close-btn" id="dlCloseBtn">Begin Keeping Time</button>
+    <div class="dl-tab-content">
+      <div class="dl-tab-panel active" id="dlPanelInstr" role="tabpanel">
+        <ol class="dl-step-list">
+          <li><span class="dl-step-num">1</span><span>Print it. Pin it somewhere you'll see it every day.</span></li>
+          <li><span class="dl-step-num">2</span><span>Watch the moon. Each phase is a sabbath — a reason to gather, rest, or act.</span></li>
+          <li><span class="dl-step-num">3</span><span>Write what you do. Journal the prompts. Keep a record of keeping time differently.</span></li>
+          <li><span class="dl-step-num">4</span><span>Share it. Invite someone into the rhythm. The calendar belongs to everyone.</span></li>
+        </ol>
+      </div>
+      <div class="dl-tab-panel" id="dlPanelDates" role="tabpanel">
+        <div class="dl-dates-grid" id="dlDatesGrid"></div>
+      </div>
+    </div>
+    <div class="dl-footer">
+      <button class="dl-close-btn" id="dlCloseBtn">← Back to Page</button>
+    </div>
   </div>
 </div>
 
@@ -2147,7 +2201,27 @@
     });
   }
 
-  // Close ceremony
+  // Tab switching
+  document.querySelectorAll('.dl-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var target = this.getAttribute('data-tab');
+      // Update tab buttons
+      document.querySelectorAll('.dl-tab').forEach(function(t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      this.classList.add('active');
+      this.setAttribute('aria-selected', 'true');
+      // Update panels
+      document.querySelectorAll('.dl-tab-panel').forEach(function(p) {
+        p.classList.remove('active');
+      });
+      var panelId = target === 'instructions' ? 'dlPanelInstr' : 'dlPanelDates';
+      document.getElementById(panelId).classList.add('active');
+    });
+  });
+
+  // Close ceremony — back to page
   document.getElementById('dlCloseBtn').addEventListener('click', function() {
     var overlay = document.getElementById('dlOverlay');
     var moon = document.getElementById('dlMoon');
@@ -2167,6 +2241,12 @@
       moon.style.fontSize = '8rem';
       labelEl.style.opacity = '0';
       document.getElementById('dlStars').innerHTML = '';
+      // Reset tabs to instructions
+      document.querySelectorAll('.dl-tab').forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      document.getElementById('dlTabInstr').classList.add('active');
+      document.getElementById('dlTabInstr').setAttribute('aria-selected', 'true');
+      document.querySelectorAll('.dl-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.getElementById('dlPanelInstr').classList.add('active');
     }, 700);
   });
 </script>
