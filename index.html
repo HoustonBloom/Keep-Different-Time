@@ -2071,7 +2071,7 @@
     </ol>
     <div class="dl-footer">
       <button class="share-close-btn" id="shareCloseBtn">← Back</button>
-      <button class="dl-share-btn" onclick="event.stopPropagation(); generateCalendarPDF();">Download Calendar →</button>
+      <button class="dl-share-btn" onclick="event.stopPropagation(); closeShareAndDownload();">Download Calendar →</button>
     </div>
   </div>
 </div>
@@ -2678,6 +2678,38 @@
       document.getElementById('hero').scrollIntoView();
     }, 700);
   });
+
+  // Close share overlay then launch download ceremony
+  function closeShareAndDownload() {
+    var overlay = document.getElementById('shareOverlay');
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    setTimeout(function() {
+      var sun = document.getElementById('shareSun');
+      var eclipse = document.getElementById('shareEclipse');
+      var corona = document.getElementById('shareCorona');
+      var content = document.getElementById('shareContent');
+
+      content.classList.remove('visible');
+      document.getElementById('shareSunWrap').style.display = '';
+      document.getElementById('shareLabel').style.display = '';
+      sun.classList.remove('visible');
+      sun.style.opacity = '';
+      sun.style.transition = '';
+      eclipse.classList.remove('totality');
+      eclipse.style.opacity = '';
+      eclipse.style.transition = '';
+      corona.classList.remove('visible');
+      corona.style.opacity = '';
+      corona.style.transition = '';
+      document.getElementById('shareLabel').classList.remove('visible');
+      document.getElementById('shareStars').innerHTML = '';
+
+      // Launch the download ceremony
+      startDownloadCeremony();
+    }, 700);
+  }
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
