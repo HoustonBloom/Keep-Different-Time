@@ -1420,6 +1420,9 @@
     });
     if (navMoon && moonPhases[current]) {
       navMoon.textContent = moonPhases[current];
+      // ○ and ◐ render smaller in most fonts — scale them up 30%
+      var ch = moonPhases[current];
+      navMoon.style.fontSize = (ch === '○' || ch === '◐') ? '2.1rem' : '1.6rem';
     }
   });
 
