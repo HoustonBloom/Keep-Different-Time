@@ -2545,6 +2545,7 @@
 
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Reset for next use
     setTimeout(function() {
@@ -2651,6 +2652,7 @@
     var overlay = document.getElementById('shareOverlay');
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     setTimeout(function() {
       var sun = document.getElementById('shareSun');
