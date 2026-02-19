@@ -1198,6 +1198,11 @@
     transition: transform 0.4s ease, opacity 0.3s ease;
   }
 
+  /* Mobile download shortcut — hidden on desktop */
+  .mobile-dl-btn {
+    display: none;
+  }
+
   /* ========== ANIMATIONS ========== */
   .reveal {
     opacity: 0;
@@ -1760,6 +1765,25 @@
     .arg-toggle { display: none; }
     .arg-body { opacity: 1 !important; max-height: none !important; margin-top: 1rem !important; }
     .moon-widget { bottom: 0.75rem; right: 0.75rem; }
+    .mobile-dl-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      position: fixed;
+      bottom: 0.75rem;
+      left: 0.75rem;
+      z-index: 100;
+      background: linear-gradient(135deg, var(--night) 0%, var(--purple-deep) 100%);
+      border: 1px solid rgba(124,58,237,0.3);
+      padding: 0.7rem 1rem;
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--purple-light);
+      text-decoration: none;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.25);
+    }
     .hero-stamp {
       position: fixed;
       top: 0.75rem;
@@ -2017,6 +2041,8 @@
     <span class="moon-widget-countdown" id="moonCountdown"></span>
   </div>
 </div>
+
+<a href="#download" class="mobile-dl-btn" aria-label="Jump to download section">↓ Download</a>
 
 <!-- Download Ceremony Overlay -->
 <div class="dl-overlay" id="dlOverlay" aria-hidden="true" role="dialog" aria-label="Download ceremony">
