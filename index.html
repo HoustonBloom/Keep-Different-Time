@@ -143,15 +143,19 @@
   }
 
   .side-nav a.nav-moon {
-    font-size: 2rem;
+    font-size: 1.6rem;
     writing-mode: horizontal-tb;
-    padding: 0.6rem 0;
-    opacity: 0.8;
-    margin-bottom: 0.5rem;
+    padding: 0.8rem 0;
+    opacity: 1;
     color: var(--purple-light);
     text-decoration: none;
     border-left: 2px solid transparent;
     letter-spacing: 0;
+    order: -1;
+    text-shadow:
+      0 0 8px rgba(167,139,250,0.4),
+      0 0 16px rgba(167,139,250,0.2);
+    transition: all 0.3s ease;
   }
 
   .side-nav a.nav-moon:hover {
@@ -160,7 +164,9 @@
     color: var(--purple-bright);
     border-left-color: transparent;
     transform: scale(1.15);
-    transition: all 0.2s ease;
+    text-shadow:
+      0 0 12px rgba(167,139,250,0.6),
+      0 0 24px rgba(167,139,250,0.3);
   }
 
   main { margin-left: 56px; }
@@ -1214,7 +1220,7 @@
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <nav class="side-nav" aria-label="Section navigation">
-  <a href="#hero" class="nav-moon" aria-label="Back to top">☾</a>
+  <a href="#hero" class="nav-moon" aria-label="Back to top">●</a>
   <a href="#argument" aria-label="Why keep different time">Manifesto</a>
   <a href="#calendar" aria-label="The calendar">Calendar</a>
   <a href="#download" aria-label="Download the calendar">Download</a>
@@ -1480,7 +1486,7 @@
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.side-nav a');
   const navMoon = document.querySelector('.side-nav .nav-moon');
-  const moonPhases = { hero: '☾', argument: '◑', calendar: '○', download: '●', how: '☽' };
+  const moonPhases = { hero: '●', argument: '◑', calendar: '○', download: '◐', how: '●' };
   window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(s => {
