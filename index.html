@@ -879,64 +879,6 @@
   .blue-card:first-child .blue-rare { color: #334155; /* slate-700 */ }
   .blue-card:last-child .blue-rare { color: #cbd5e1; /* silver */ }
 
-  /* ========== HOW ========== */
-  .how-section {
-    background: var(--frost);
-    padding: 5rem 3rem 5rem 4rem;
-    border-bottom: 1px solid var(--ice);
-    position: relative;
-  }
-
-  .how-section::before {
-    content: '';
-    position: absolute;
-    top: -6px; left: 25%;
-    width: 120px; height: 16px;
-    background: rgba(168,85,247,0.12);
-    transform: rotate(-1deg);
-  }
-
-  .how-steps {
-    max-width: 700px;
-    counter-reset: howstep;
-    list-style: none;
-  }
-
-  .how-step {
-    counter-increment: howstep;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid rgba(124,58,237,0.08);
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-  }
-
-  .how-step:last-child { border-bottom: none; }
-
-  .how-step::before {
-    content: counter(howstep);
-    font-family: 'VT323', monospace;
-    font-size: 3rem;
-    color: var(--purple-vivid); /* 4.6:1 on frost */
-    line-height: 1;
-    min-width: 2.5rem;
-  }
-
-  .how-step h3 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-    color: var(--deep);
-  }
-
-  .how-step p {
-    font-family: 'Libre Baskerville', serif;
-    font-size: 0.85rem;
-    line-height: 1.75;
-    color: #1e293b; /* slate-800: ~12:1 on frost */
-  }
 
   /* ========== CTA ========== */
   .cta-section {
@@ -1423,30 +1365,6 @@
   <div class="cta-moon-bg" aria-hidden="true">☾</div>
 </section>
 
-<section class="how-section" id="how" aria-labelledby="how-heading">
-  <h2 id="how-heading" class="sr-only">How to start</h2>
-  <div class="cal-section-title" aria-hidden="true">/// How to Start ///</div>
-  <ol class="how-steps">
-    <li class="how-step reveal">
-      <div class="how-text">
-        <h3>Download the calendar</h3>
-        <p>A printable template mapping lunar phases and solar feasts for the year. Pin it up. That's the entire infrastructure.</p>
-      </div>
-    </li>
-    <li class="how-step reveal">
-      <div class="how-text">
-        <h3>Invite one person</h3>
-        <p>This isn't a movement. It's a rhythm. It works when it's shared with the people you're actually trying to hold close. Start with one.</p>
-      </div>
-    </li>
-    <li class="how-step reveal">
-      <div class="how-text">
-        <h3>Let the moon organize you</h3>
-        <p>You don't have to do all of it. Notice which phase the moon is in. Let the question it carries sit with you. The rhythm does the relational work that individual willpower can't sustain.</p>
-      </div>
-    </li>
-  </ol>
-</section>
 
 </main>
 
