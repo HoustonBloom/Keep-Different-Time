@@ -480,54 +480,6 @@
     padding: 0 0.2em;
   }
 
-  /* ========== PULLQUOTE ========== */
-  .pullquote {
-    /* blue-to-purple gradient */
-    background:
-      linear-gradient(135deg, var(--blue-deep) 0%, var(--purple-deep) 60%, var(--night) 100%);
-    color: var(--frost);
-    padding: 5rem 3rem 5rem 4rem;
-    position: relative;
-    border-bottom: 2px solid var(--blue-mid);
-    overflow: hidden;
-  }
-
-  .pullquote p {
-    font-size: clamp(1.6rem, 5vw, 3.5rem);
-    max-width: 850px;
-    line-height: 1.25;
-  }
-
-  /* All pullquote text: high contrast on dark bg */
-  .pullquote .pq-a { font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; color: #cbd5e1; } /* silver: ~11:1 */
-  .pullquote .pq-b { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; color: #f1f5f9; } /* frost: ~16:1 */
-  .pullquote .pq-c {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    color: #c4b5fd; /* purple-300: passes on dark blue */
-    text-decoration: underline;
-    text-decoration-thickness: 3px;
-    text-underline-offset: 5px;
-    text-decoration-color: var(--purple-vivid);
-  }
-
-  .pullquote::after {
-    content: '☾';
-    position: absolute;
-    right: 4rem; bottom: -1.5rem;
-    font-size: 14rem;
-    opacity: 0.06;
-    color: var(--blue-bright);
-  }
-
-  .pullquote::before {
-    content: '';
-    position: absolute;
-    top: -40%; right: -5%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 65%);
-    pointer-events: none;
-  }
-
   /* ========== CALENDAR ========== */
   .calendar-section {
     padding: 5rem 3rem 5rem 4rem;
@@ -1239,14 +1191,6 @@
     <div class="arg-toggle" aria-hidden="true"><span class="arg-toggle-text">[read]</span></div>
   </div>
 
-</section>
-
-<section class="pullquote" aria-label="Key message">
-  <p>
-    <span class="pq-a">You don't have to leave the system.</span><br>
-    <span class="pq-b">You just start keeping</span><br>
-    <span class="pq-c">different time.</span>
-  </p>
 </section>
 
 <section class="calendar-section" id="calendar" aria-labelledby="cal-heading">
