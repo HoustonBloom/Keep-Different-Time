@@ -142,16 +142,26 @@
     outline-offset: -2px;
   }
 
-  .side-nav .nav-moon {
+  .side-nav a.nav-moon {
     font-size: 2rem;
     writing-mode: horizontal-tb;
     padding: 0.6rem 0;
     opacity: 0.8;
     margin-bottom: 0.5rem;
     color: var(--purple-light);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    letter-spacing: 0;
   }
 
-  .side-nav .nav-moon:hover { background: transparent; }
+  .side-nav a.nav-moon:hover {
+    background: transparent;
+    opacity: 1;
+    color: var(--purple-bright);
+    border-left-color: transparent;
+    transform: scale(1.15);
+    transition: all 0.2s ease;
+  }
 
   main { margin-left: 56px; }
 
@@ -289,13 +299,19 @@
   /* ========== ARGUMENT ========== */
   .argument {
     padding: 0;
-    /* BLUE-TO-BLACK gradient background */
+    /* Ethereal deep-space gradient with purple nebula glow */
     background:
+      radial-gradient(ellipse at 20% 30%, rgba(124,58,237,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(37,99,235,0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 50%, rgba(167,139,250,0.06) 0%, transparent 60%),
+      radial-gradient(circle at 70% 20%, rgba(96,165,250,0.08) 0%, transparent 35%),
       linear-gradient(180deg,
         var(--void) 0%,
-        var(--night) 25%,
+        #0a0f1e 15%,
+        #0e1a30 30%,
         var(--ocean) 50%,
-        var(--night) 75%,
+        #0e1a30 70%,
+        #0a0f1e 85%,
         var(--void) 100%
       );
     color: var(--frost);
@@ -308,26 +324,27 @@
   .argument::before,
   .argument::after {
     position: absolute;
-    font-size: 12rem;
-    opacity: 0.03;
+    font-size: 16rem;
+    opacity: 0.045;
     pointer-events: none;
     z-index: 0;
     will-change: transform;
+    filter: blur(1px);
   }
 
   .argument::before {
     content: '☾';
-    top: 8%;
-    right: -2rem;
+    top: 5%;
+    right: -3rem;
     color: var(--purple-bright);
     animation: float-drift-1 18s ease-in-out infinite;
   }
 
   .argument::after {
     content: '○';
-    bottom: 12%;
-    left: -1rem;
-    font-size: 8rem;
+    bottom: 8%;
+    left: -2rem;
+    font-size: 12rem;
     color: var(--blue-bright);
     animation: float-drift-2 22s ease-in-out infinite;
   }
@@ -370,8 +387,8 @@
   .arg-star:nth-child(8) { top: 15%; left: 45%; animation-delay: 2.5s; }
 
   @keyframes twinkle {
-    0%, 100% { opacity: 0.15; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.8); }
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(2.2); }
   }
 
   .arg-panel {
@@ -494,12 +511,25 @@
   }
 
   .cal-section-title {
-    font-family: 'VT323', monospace;
-    font-size: 0.8rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.4rem, 3vw, 2rem);
     text-transform: uppercase;
-    letter-spacing: 0.5em;
-    color: var(--slate);
+    letter-spacing: 0.3em;
+    color: var(--deep);
     margin-bottom: 4rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .cal-section-title::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--purple-vivid), var(--blue-bright), transparent);
+    margin-top: 0.5rem;
+    opacity: 0.4;
   }
 
   .tier { margin-bottom: 5rem; }
@@ -524,7 +554,7 @@
     font-family: 'Courier Prime', monospace;
     font-style: italic;
     font-size: 0.75rem;
-    color: var(--slate); /* 4.6:1 on white */
+    color: #334155; /* slate-700: ~8:1 on white */
   }
 
   .tier-line {
@@ -600,7 +630,7 @@
   .feast-date {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
-    color: var(--slate);
+    color: #334155; /* slate-700 */
     margin-bottom: 0.5rem;
     letter-spacing: 0.05em;
   }
@@ -627,7 +657,7 @@
     font-size: 0.78rem;
     line-height: 1.65;
     font-style: italic;
-    color: var(--slate); /* 4.6:1 on white */
+    color: #334155; /* slate-700: ~8:1 on white */
   }
 
   /* LUNAR SCROLL */
@@ -649,7 +679,7 @@
   .lunar-scroll-hint {
     font-family: 'VT323', monospace;
     font-size: 0.75rem;
-    color: var(--slate);
+    color: #334155; /* slate-700 */
     margin-bottom: 1rem;
     letter-spacing: 0.1em;
   }
@@ -756,7 +786,7 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.05em;
-    color: #94a3b8; /* slate-400: ~7:1 on void */
+    color: #cbd5e1; /* silver: ~11:1 on void */
   }
 
   .moon-prompt span { color: var(--purple-light); }
@@ -830,7 +860,7 @@
     color: #ddd6fe; /* purple-200: ~11:1 on void */
   }
 
-  .blue-card:first-child .feast-desc { color: var(--slate); } /* 4.6:1 on white */
+  .blue-card:first-child .feast-desc { color: #334155; } /* slate-700: ~8:1 on white */
   .blue-card:last-child .feast-desc { color: #cbd5e1; } /* 11:1 on void */
 
   .blue-rare {
@@ -840,8 +870,8 @@
     font-style: italic;
   }
 
-  .blue-card:first-child .blue-rare { color: var(--slate); }
-  .blue-card:last-child .blue-rare { color: #94a3b8; }
+  .blue-card:first-child .blue-rare { color: #334155; /* slate-700 */ }
+  .blue-card:last-child .blue-rare { color: #cbd5e1; /* silver */ }
 
   /* ========== HOW ========== */
   .how-section {
@@ -899,7 +929,7 @@
     font-family: 'Libre Baskerville', serif;
     font-size: 0.85rem;
     line-height: 1.75;
-    color: #475569; /* slate: 4.6:1 on frost */
+    color: #1e293b; /* slate-800: ~12:1 on frost */
   }
 
   /* ========== CTA ========== */
@@ -955,7 +985,7 @@
     max-width: 480px;
     line-height: 1.7;
     margin-bottom: 2.5rem;
-    color: #94a3b8; /* ~7:1 on void */
+    color: #cbd5e1; /* silver: ~11:1 on void */
     position: relative;
     z-index: 1;
   }
@@ -1031,11 +1061,32 @@
   }
 
   .footer-left {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.65rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #64748b; /* ~5:1 on void */
+    letter-spacing: 0.08em;
+    color: #cbd5e1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0;
+    align-items: baseline;
+  }
+
+  .footer-left span {
+    display: inline-block;
+    padding: 0 0.4rem;
+  }
+
+  .footer-left span:nth-child(1) { font-family: 'Oswald', sans-serif; font-weight: 700; transform: rotate(-1.5deg); }
+  .footer-left span:nth-child(2) { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 900; transform: rotate(1deg); }
+  .footer-left span:nth-child(3) { font-family: 'Syne', sans-serif; font-weight: 800; transform: rotate(-0.5deg); }
+  .footer-left span:nth-child(4) { font-family: 'VT323', monospace; font-size: 1.1rem; transform: rotate(2deg); }
+  .footer-left span:nth-child(5) { font-family: 'DM Serif Display', serif; transform: rotate(-1deg); }
+  .footer-left span:nth-child(6) { font-family: 'Courier Prime', monospace; font-weight: 700; transform: rotate(1.5deg); }
+
+  .footer-left .dot-sep {
+    color: var(--purple-bright);
+    font-family: 'Space Mono', monospace;
+    padding: 0 0.15rem;
   }
 
   .footer-right {
@@ -1163,8 +1214,7 @@
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <nav class="side-nav" aria-label="Section navigation">
-  <span class="nav-moon" aria-hidden="true">☾</span>
-  <a href="#hero" class="active" aria-label="Back to top">Return</a>
+  <a href="#hero" class="nav-moon" aria-label="Back to top">☾</a>
   <a href="#argument" aria-label="Why keep different time">Manifesto</a>
   <a href="#calendar" aria-label="The calendar">Calendar</a>
   <a href="#download" aria-label="Download the calendar">Download</a>
@@ -1395,7 +1445,7 @@
 </main>
 
 <footer role="contentinfo">
-  <div class="footer-left">No copyright · No trademark · No ownership · Take it · Change it · Make it yours</div>
+  <div class="footer-left"><span>No copyright</span><span class="dot-sep">·</span><span>No trademark</span><span class="dot-sep">·</span><span>No ownership</span><span class="dot-sep">·</span><span>Take it</span><span class="dot-sep">·</span><span>Change it</span><span class="dot-sep">·</span><span>Make it yours</span></div>
   <div class="footer-right" aria-hidden="true">☾ keep different time ☾</div>
 </footer>
 
@@ -1429,6 +1479,8 @@
 
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.side-nav a');
+  const navMoon = document.querySelector('.side-nav .nav-moon');
+  const moonPhases = { hero: '☾', argument: '◑', calendar: '○', download: '●', how: '☽' };
   window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(s => {
@@ -1442,6 +1494,9 @@
         a.setAttribute('aria-current', 'true');
       }
     });
+    if (navMoon && moonPhases[current]) {
+      navMoon.textContent = moonPhases[current];
+    }
   });
 
   const ls = document.getElementById('lunarScroll');
@@ -1487,7 +1542,7 @@
         const rect = panel.getBoundingClientRect();
         const panelCenter = rect.top + rect.height / 2;
         const viewCenter = window.innerHeight / 2;
-        const offset = (panelCenter - viewCenter) * 0.15;
+        const offset = (panelCenter - viewCenter) * 0.35;
         num.style.transform = 'translateY(' + offset + 'px)';
       });
       ticking = false;
