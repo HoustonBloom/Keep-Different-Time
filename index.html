@@ -1152,7 +1152,7 @@
     outline-offset: 3px;
   }
 
-  .moon-widget-icon { font-size: 2rem; }
+  .moon-widget-icon { font-size: 2rem; color: var(--purple-light); }
 
   .moon-widget-text {
     color: #e2e8f0;
@@ -1462,8 +1462,291 @@
     box-shadow: 0 0 25px rgba(124,58,237,0.3);
   }
 
+  .dl-share-btn {
+    display: inline-block;
+    padding: 0.7rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border: 2px solid var(--purple-vivid);
+    background: var(--purple-vivid);
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .dl-share-btn:hover {
+    background: var(--purple-bright);
+    border-color: var(--purple-bright);
+    box-shadow: 0 0 25px rgba(124,58,237,0.4);
+  }
+
+  .dl-footer {
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  /* ========== SHARE CEREMONY (SOLAR ECLIPSE) ========== */
+  .share-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .share-overlay.active {
+    pointer-events: all;
+    opacity: 1;
+  }
+
+  .share-overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--void);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .share-overlay.active .share-overlay-bg { opacity: 1; }
+
+  .share-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .share-stars span {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fde68a;
+    border-radius: 50%;
+    opacity: 0;
+    animation: share-star-in 0.4s ease forwards;
+  }
+
+  @keyframes share-star-in {
+    0% { opacity: 0; transform: scale(0); }
+    100% { opacity: 0.5; transform: scale(1); }
+  }
+
+  /* Sun */
+  .share-sun-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 120px;
+    height: 120px;
+  }
+
+  .share-sun {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fef3c7 0%, #fbbf24 40%, #f59e0b 100%);
+    box-shadow:
+      0 0 30px rgba(251,191,36,0.6),
+      0 0 80px rgba(245,158,11,0.3),
+      0 0 140px rgba(251,191,36,0.15);
+    opacity: 0;
+    transform: scale(0.3);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .share-sun.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Eclipse moon — slides over the sun */
+  .share-eclipse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--void);
+    transform: translateX(-250%);
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  .share-eclipse.totality {
+    transform: translateX(0);
+  }
+
+  /* Corona glow at totality */
+  .share-corona {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px solid rgba(251,191,36,0.4);
+    box-shadow:
+      0 0 20px rgba(251,191,36,0.3),
+      0 0 50px rgba(251,191,36,0.2),
+      0 0 100px rgba(245,158,11,0.15),
+      inset 0 0 30px rgba(251,191,36,0.1);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 3;
+  }
+
+  .share-corona.visible {
+    opacity: 1;
+    animation: corona-pulse 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes corona-pulse {
+    0% {
+      box-shadow:
+        0 0 20px rgba(251,191,36,0.3),
+        0 0 50px rgba(251,191,36,0.2),
+        0 0 100px rgba(245,158,11,0.15),
+        inset 0 0 30px rgba(251,191,36,0.1);
+    }
+    100% {
+      box-shadow:
+        0 0 30px rgba(251,191,36,0.5),
+        0 0 70px rgba(251,191,36,0.35),
+        0 0 130px rgba(245,158,11,0.25),
+        inset 0 0 40px rgba(251,191,36,0.2);
+    }
+  }
+
+  .share-label {
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    color: #fde68a;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    position: absolute;
+    top: calc(50% + 5.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .share-label.visible {
+    opacity: 1;
+  }
+
+  /* Share content panel */
+  .share-content {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 0 1.5rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+
+  .share-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .share-content h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.2rem, 3.5vw, 2rem);
+    text-transform: uppercase;
+    color: var(--frost);
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .share-content h3 em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: #fde68a;
+    text-transform: none;
+  }
+
+  .share-copied {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: #fbbf24;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .share-ideas {
+    list-style: none;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .share-ideas li {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(251,191,36,0.08);
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+
+  .share-ideas li:last-child { border-bottom: none; }
+
+  .share-idea-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+
+  .share-close-btn {
+    display: inline-block;
+    padding: 0.7rem 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border: 2px solid #f59e0b;
+    background: rgba(245,158,11,0.15);
+    color: #fde68a;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-top: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .share-close-btn:hover {
+    background: #f59e0b;
+    color: var(--void);
+    box-shadow: 0 0 25px rgba(245,158,11,0.3);
+  }
+
   /* ========== MOBILE ========== */
   @media (max-width: 768px) {
+    html, body { overflow-x: hidden; }
     .side-nav { display: none; }
     main { margin-left: 0; }
     footer { margin-left: 0; }
@@ -1487,9 +1770,9 @@
       z-index: 999;
     }
     .hero-moon-img {
-      width: 256px;
+      width: 308px;
       top: 1rem;
-      left: 1rem;
+      left: -1rem;
       right: auto;
     }
   }
@@ -1712,7 +1995,7 @@
   <p class="cta-sub">A printable calendar. A shared rhythm. An ancient clock that belongs to no one and therefore belongs to you.</p>
   <div class="cta-buttons" role="group" aria-label="Download options">
     <a href="#" class="cta-btn" role="button" id="downloadPdfBtn" onclick="event.preventDefault(); startDownloadCeremony();">Download Calendar (PDF)</a>
-    <a href="#" class="cta-btn btn-purple" role="button">Send to a Friend</a>
+    <a href="#" class="cta-btn btn-purple" role="button" onclick="event.preventDefault(); startShareCeremony();">Send to a Friend</a>
   </div>
   <div class="cta-moon-bg" aria-hidden="true">☾</div>
 </section>
@@ -1761,8 +2044,32 @@
       </div>
     </div>
     <div class="dl-footer">
+      <button class="dl-share-btn" id="dlShareBtn" onclick="startShareCeremony();">☾ Send to a Friend</button>
       <button class="dl-close-btn" id="dlCloseBtn">← Back to Page</button>
     </div>
+  </div>
+</div>
+
+<!-- Share Ceremony Overlay (Solar Eclipse) -->
+<div class="share-overlay" id="shareOverlay" aria-hidden="true" role="dialog" aria-label="Share ceremony">
+  <div class="share-overlay-bg"></div>
+  <div class="share-stars" id="shareStars" aria-hidden="true"></div>
+  <div class="share-sun-wrap" id="shareSunWrap">
+    <div class="share-sun" id="shareSun"></div>
+    <div class="share-eclipse" id="shareEclipse"></div>
+    <div class="share-corona" id="shareCorona"></div>
+  </div>
+  <div class="share-label" id="shareLabel">Totality</div>
+  <div class="share-content" id="shareContent">
+    <h3>Link copied — <em>share the rhythm</em></h3>
+    <p class="share-copied">houstonbloom.github.io/Keep-Different-Time</p>
+    <ol class="share-ideas">
+      <li><span class="share-idea-icon">○</span><span>Pick a moon phase and make it your night — cook, gather, go outside together.</span></li>
+      <li><span class="share-idea-icon">◑</span><span>Track the same cycle apart — text each other what you noticed under the moon.</span></li>
+      <li><span class="share-idea-icon">●</span><span>Start a shared journal — one prompt per phase, pass it back and forth.</span></li>
+      <li><span class="share-idea-icon">◐</span><span>Plan something for the next full moon — a meal, a walk, a reason to look up.</span></li>
+    </ol>
+    <button class="share-close-btn" id="shareCloseBtn">← Back</button>
   </div>
 </div>
 
@@ -2252,6 +2559,116 @@
       document.getElementById('dlTabInstr').setAttribute('aria-selected', 'true');
       document.querySelectorAll('.dl-tab-panel').forEach(function(p) { p.classList.remove('active'); });
       document.getElementById('dlPanelInstr').classList.add('active');
+    }, 700);
+  });
+
+  // ========== SHARE CEREMONY (SOLAR ECLIPSE) ==========
+  function startShareCeremony() {
+    // Copy link to clipboard
+    var shareUrl = 'https://houstonbloom.github.io/Keep-Different-Time/';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl);
+    }
+
+    var overlay = document.getElementById('shareOverlay');
+    var sun = document.getElementById('shareSun');
+    var eclipse = document.getElementById('shareEclipse');
+    var corona = document.getElementById('shareCorona');
+    var label = document.getElementById('shareLabel');
+    var content = document.getElementById('shareContent');
+    var stars = document.getElementById('shareStars');
+    var sunWrap = document.getElementById('shareSunWrap');
+
+    // Reset state
+    overlay.setAttribute('aria-hidden', 'false');
+    sun.classList.remove('visible');
+    eclipse.classList.remove('totality');
+    corona.classList.remove('visible');
+    label.classList.remove('visible');
+    content.classList.remove('visible');
+    sunWrap.style.display = '';
+    label.style.display = '';
+    stars.innerHTML = '';
+
+    // Activate overlay
+    overlay.classList.add('active');
+
+    // Spawn stars with warm tones
+    for (var i = 0; i < 50; i++) {
+      (function(delay) {
+        setTimeout(function() {
+          var s = document.createElement('span');
+          s.style.left = Math.random() * 100 + '%';
+          s.style.top = Math.random() * 100 + '%';
+          var size = (1 + Math.random() * 2) + 'px';
+          s.style.width = size;
+          s.style.height = size;
+          s.style.animationDelay = (Math.random() * 0.3) + 's';
+          stars.appendChild(s);
+        }, delay);
+      })(i * 60);
+    }
+
+    // 600ms — Sun appears
+    setTimeout(function() {
+      sun.classList.add('visible');
+    }, 600);
+
+    // 1200ms — Moon slides in for eclipse
+    setTimeout(function() {
+      eclipse.classList.add('totality');
+    }, 1400);
+
+    // 2200ms — Corona appears at totality
+    setTimeout(function() {
+      corona.classList.add('visible');
+      label.classList.add('visible');
+    }, 2400);
+
+    // 3400ms — Fade eclipse elements, show content
+    setTimeout(function() {
+      sun.style.transition = 'opacity 0.6s ease';
+      sun.style.opacity = '0';
+      eclipse.style.transition = 'opacity 0.6s ease';
+      eclipse.style.opacity = '0';
+      corona.style.transition = 'opacity 0.6s ease';
+      corona.style.opacity = '0';
+      label.classList.remove('visible');
+
+      setTimeout(function() {
+        sunWrap.style.display = 'none';
+        label.style.display = 'none';
+        content.classList.add('visible');
+      }, 600);
+    }, 3600);
+  }
+
+  // Close share ceremony
+  document.getElementById('shareCloseBtn').addEventListener('click', function() {
+    var overlay = document.getElementById('shareOverlay');
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    setTimeout(function() {
+      var sun = document.getElementById('shareSun');
+      var eclipse = document.getElementById('shareEclipse');
+      var corona = document.getElementById('shareCorona');
+      var content = document.getElementById('shareContent');
+
+      content.classList.remove('visible');
+      document.getElementById('shareSunWrap').style.display = '';
+      document.getElementById('shareLabel').style.display = '';
+      sun.classList.remove('visible');
+      sun.style.opacity = '';
+      sun.style.transition = '';
+      eclipse.classList.remove('totality');
+      eclipse.style.opacity = '';
+      eclipse.style.transition = '';
+      corona.classList.remove('visible');
+      corona.style.opacity = '';
+      corona.style.transition = '';
+      document.getElementById('shareLabel').classList.remove('visible');
+      document.getElementById('shareStars').innerHTML = '';
     }, 700);
   });
 </script>
