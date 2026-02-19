@@ -1427,8 +1427,22 @@
     .arg-toggle { display: none; }
     .arg-body { opacity: 1 !important; max-height: none !important; margin-top: 1rem !important; }
     .moon-widget { bottom: 0.75rem; right: 0.75rem; }
-    .hero-stamp { top: 0.75rem; right: 0.75rem; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-width: 3px; }
-    .hero-moon-img { width: 200px; right: -1rem; }
+    .hero-stamp {
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      font-size: 1.05rem;
+      padding: 0.5rem 1rem;
+      border-width: 3px;
+      z-index: 999;
+    }
+    .hero-moon-img {
+      width: 160px;
+      top: 1rem;
+      left: 1rem;
+      right: auto;
+      transform: rotate(0deg);
+    }
   }
 
   @media (forced-colors: active) {
@@ -1797,17 +1811,26 @@
   (function() {
     var moonImg = document.querySelector('.hero-moon-img');
     if (moonImg) {
+      var isMobile = window.matchMedia('(max-width: 768px)').matches;
       var moonTick = false;
       window.addEventListener('scroll', function() {
         if (!moonTick) {
           requestAnimationFrame(function() {
             var deg = window.scrollY * 0.35;
-            moonImg.style.transform = 'translateY(-50%) rotate(' + deg + 'deg)';
+            if (isMobile) {
+              moonImg.style.transform = 'rotate(' + deg + 'deg)';
+            } else {
+              moonImg.style.transform = 'translateY(-50%) rotate(' + deg + 'deg)';
+            }
             moonTick = false;
           });
           moonTick = true;
         }
       }, { passive: true });
+      // Update on resize
+      window.addEventListener('resize', function() {
+        isMobile = window.matchMedia('(max-width: 768px)').matches;
+      });
     }
   })();
 
